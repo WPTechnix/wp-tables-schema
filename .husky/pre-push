@@ -1,0 +1,37 @@
+#!/bin/bash
+# Husky pre-push hook
+
+# Do not run on CI environments (e.g., GitHub Actions)
+if [ "$CI" = "true" ]; then
+  echo "CI environment detected. Skipping pre-push checks."
+  exit 0
+fi
+
+# This script runs unit tests before allowing a push to the remote repository.
+echo "🔍 Running pre-push checks..."
+
+# --- Find Composer Command ---
+# Check if ./bin/composer exists and Docker is installed
+if [ -f "./bin/composer" ] && command -v docker >/dev/null 2>&1; then
+  COMPOSER_CMD="./bin/composer"
+elif command -v composer >/dev/null 2>&1; then
+  COMPOSER_CMD="composer"
+else
+  echo "❌ Error: Neither ./bin/composer (with Docker installed) nor a global 'composer' command is available. Cannot run tests."
+  exit 1
+fi
+
+# --- Ensure Dependencies Are Installed ---
+if [ ! -d "vendor" ]; then
+  echo "Vendor directory not found. Running composer install..."
+  $COMPOSER_CMD install --no-interaction --prefer-dist --no-progress
+fi
+
+# --- Run Tests ---
+echo "🧪 Running unit tests (composer test)..."
+$COMPOSER_CMD test
+
+# If the script reaches here, all checks have passed.
+echo "✅ Pre-push checks passed. Pushing to remote..."
+
+exit 0

@@ -1,0 +1,280 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main, 'release/**' ]
+    paths-ignore:
+      # ignore markdowns and unrelated files
+      - '**.md'
+      - 'docker/**'
+      - '.husky/**'
+      - '.editorconfig'
+      - '.gitattributes'
+      - '.release-it.json'
+      - 'bin/copy'
+      - 'bin/docker'
+      - 'bin/composer'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/commitlint.yml'
+      - '.github/workflows/release.yml'
+
+  pull_request:
+    branches: [ main, 'release/**' ]
+    paths-ignore:
+      # ignore markdowns and unrelated files
+      - '**.md'
+      - 'docker/**'
+      - '.husky/**'
+      - '.editorconfig'
+      - '.gitattributes'
+      - '.release-it.json'
+      - 'bin/copy'
+      - 'bin/docker'
+      - 'bin/composer'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/commitlint.yml'
+      - '.github/workflows/release.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # PHPCS - Test with both minimum and maximum PHP versions
+  # This ensures coding standards work with different dependency versions
+  lint:
+    name: Code Style (PHP ${{ matrix.php-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: [8.0, 8.4]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer
+          coverage: none
+
+      # Cache composer dependencies per PHP version
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-php${{ matrix.php-version }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-php${{ matrix.php-version }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      # For PRs: Only run on changed files (faster feedback)
+      - name: Run PHPCS on changed files (Pull Request)
+        if: github.event_name == 'pull_request'
+        run: |
+          CHANGED_FILES=$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} -- '*.php' || echo '')
+
+          if [[ -n "$CHANGED_FILES" ]]; then
+            echo "$CHANGED_FILES" | xargs ./vendor/bin/phpcs --report=checkstyle --no-cache > phpcs-report-${{ matrix.php-version }}.xml || true
+          else
+            echo "No PHP files changed. Skipping PHPCS."
+            echo '<checkstyle/>' > phpcs-report-${{ matrix.php-version }}.xml
+          fi
+
+      # Only annotate from one PHP version to avoid duplicate comments
+      - name: Create annotations from PHPCS report (Pull Request)
+        if: github.event_name == 'pull_request' && matrix.php-version == '8.0'
+        uses: staabm/annotate-pull-request-from-checkstyle-action@v1
+        with:
+          files: phpcs-report-${{ matrix.php-version }}.xml
+          notices-as-warnings: true
+
+      # For pushes to main: Full scan as final safety check
+      - name: Run PHPCS full scan (Push)
+        if: github.event_name != 'pull_request'
+        run: ./vendor/bin/phpcs --no-cache
+
+  # PHPStan - Run on highest PHP version for maximum coverage
+  static-analysis:
+    name: Static Analysis (PHPStan)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          tools: composer
+          coverage: none
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-php8.4-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-php8.4-composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Run PHPStan
+        run: ./vendor/bin/phpstan analyse --no-progress --error-format=github
+
+
+  # Test against multiple PHP versions with their respective dependencies
+  phpunit-php-versions:
+    name: PHPUnit (PHP ${{ matrix.php-version }}, WP ${{ matrix.wordpress-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: [8.0, 8.1, 8.2, 8.3, 8.4]
+        wordpress-version: ['latest']
+        include:
+          # Test minimum PHP with minimum supported WordPress
+          - php-version: 8.0
+            wordpress-version: '6.0'
+          # Test maximum PHP with latest WordPress
+          - php-version: 8.4
+            wordpress-version: 'latest'
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress_tests
+          MYSQL_USER: wordpress
+          MYSQL_PASSWORD: wordpress
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer
+          coverage: none
+          extensions: mysqli
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-php${{ matrix.php-version }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-php${{ matrix.php-version }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Setup System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y subversion default-mysql-client
+
+      - name: Install WordPress Test Suite
+        run: |
+          chmod +x ./bin/install-wp-tests
+          ./bin/install-wp-tests wordpress_tests wordpress wordpress 127.0.0.1 ${{ matrix.wordpress-version }}
+
+  phpunit-db-versions:
+    name: PHPUnit (${{ matrix.db-name }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - db-image: mysql:5.7
+            db-name: MySQL 5.7
+          - db-image: mysql:8.0
+            db-name: MySQL 8.0
+          - db-image: mariadb:10.2
+            db-name: MariaDB 10.2
+          - db-image: mariadb:10.11
+            db-name: MariaDB 10.11
+    services:
+      database:
+        image: ${{ matrix.db-image }}
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress_tests
+          MYSQL_USER: wordpress
+          MYSQL_PASSWORD: wordpress
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          tools: composer
+          coverage: none
+          extensions: mysqli
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-php8.2-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-php8.2-composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Setup System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y subversion default-mysql-client
+
+      - name: Cache WordPress Test Suite
+        id: cache-wp-tests
+        uses: actions/cache@v4
+        with:
+          path: /tmp/wordpress-tests-suite
+          key: ${{ runner.os }}-wp-tests-${{ hashFiles('**/bin/install-wp-tests') }}
+          restore-keys: |
+            ${{ runner.os }}-wp-tests-
+
+      - name: Install WordPress Test Suite
+        if: steps.cache-wp-tests.outputs.cache-hit != 'true'
+        run: |
+          chmod +x ./bin/install-wp-tests
+          ./bin/install-wp-tests wordpress_tests wordpress wordpress 127.0.0.1 latest
+
+      - name: Run PHPUnit Tests
+        run: vendor/bin/phpunit
+        env:
+          WP_TESTS_DIR: /tmp/wordpress-tests-suite/wp-tests-lib
+          WORDPRESS_DB_HOST: 127.0.0.1
+          WORDPRESS_DB_USER: wordpress
+          WORDPRESS_DB_PASSWORD: wordpress
+          WORDPRESS_TESTS_DB_NAME: wordpress_tests
