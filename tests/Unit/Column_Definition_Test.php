@@ -354,17 +354,6 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
-	 * @test
-	 */
-	public function test_to_sql_skips_primary_key_when_flagged(): void {
-		$column = new Column_Definition( 'id', Column_Type::BIGINT );
-		$column->primary();
-		$sql = $column->to_sql( true ); // skip primary key.
-		self::assertStringNotContainsString( 'PRIMARY KEY', $sql );
-		self::assertTrue( $column->is_primary() ); // The internal state is still correct.
-	}
-
-	/**
 	 * Data provider for default values.
 	 */
 	public function default_value_provider(): array {

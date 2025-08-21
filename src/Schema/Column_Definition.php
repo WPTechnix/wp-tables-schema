@@ -652,13 +652,13 @@ final class Column_Definition {
 	/**
 	 * Generates the full SQL definition for this column.
 	 *
-	 * @param bool $skip_primary_key If true, the `PRIMARY KEY` clause will be omitted.
-	 *                               This is used by the table builder for composite primary keys.
+	 * As composite primary keys are not used, the PRIMARY KEY clause is
+	 * always generated here if the column is marked as primary.
 	 *
 	 * @return string The SQL fragment for the column.
 	 * @phpstan-return non-empty-string
 	 */
-	public function to_sql( bool $skip_primary_key = false ): string {
+	public function to_sql(): string {
 		$type_with_args = $this->type;
 		if ( ! empty( $this->args ) ) {
 			$type_with_args .= '(' . implode( ',', $this->args ) . ')';
@@ -687,7 +687,7 @@ final class Column_Definition {
 		if ( $this->auto_increments ) {
 			$sql_parts[] = 'AUTO_INCREMENT';
 		}
-		if ( $this->is_primary && ! $skip_primary_key ) {
+		if ( $this->is_primary ) {
 			$sql_parts[] = 'PRIMARY KEY';
 		}
 		if ( null !== $this->comment ) {
@@ -799,6 +799,15 @@ final class Column_Definition {
 	 */
 	public function is_auto_increment(): bool {
 		return $this->auto_increments;
+	}
+
+	/**
+	 * Check if column allows NULL values.
+	 *
+	 * @return bool
+	 */
+	public function is_nullable(): bool {
+		return $this->is_nullable;
 	}
 
 	/**

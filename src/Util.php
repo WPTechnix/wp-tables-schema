@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace WPTechnix\WP_Tables_Schema;
 
+use WPTechnix\WP_Tables_Schema\Constants\Index_Type;
+
 /**
  * A collection of utility functions.
  *
@@ -88,24 +90,26 @@ final class Util {
 	}
 
 	/**
-	 * Generates a conventional SQL index name.
+	 * Generates a conventional SQL constraint name (e.g., for indexes, foreign keys).
 	 *
 	 * Pattern: {prefix}_{table}_{columns}
-	 * If the name exceeds 64 characters, it's truncated and a hash is appended.
+	 * If the name exceeds 64 characters, it is truncated and a hash is appended
+	 * to ensure uniqueness.
 	 *
 	 * @param string $table_name The base table name (without prefix).
-	 * @param array  $columns    The columns in the index.
-	 * @param string $prefix     The index prefix (e.g., 'idx', 'uniq', 'fk').
+	 * @param array  $columns    The columns used in the constraint.
+	 * @param string $prefix     The prefix to use (e.g., "idx", "fk").
 	 *
 	 * @phpstan-param non-empty-string $table_name
 	 * @phpstan-param list<non-empty-string> $columns
 	 * @phpstan-param non-empty-string $prefix
 	 *
-	 * @return string The generated index name.
+	 * @return string The generated constraint name.
 	 *
 	 * @phpstan-return non-empty-string
 	 */
-	public static function generate_sql_index_name( string $table_name, array $columns, string $prefix ): string {
+	public static function generate_identifier_name( string $table_name, array $columns, string $prefix ): string {
+
 		// Build the ideal name.
 		$column_part = implode( '_', $columns );
 		$ideal_name  = "{$prefix}_{$table_name}_{$column_part}";
