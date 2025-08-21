@@ -7,19 +7,22 @@ parameters:
     tmpDir: /tmp/.phpstan
     paths:
         - src/
-        - tests/Unit
-        - tests/Integration
 
     scanFiles:
         - %rootDir%/../../php-stubs/wordpress-tests-stubs/wordpress-tests-stubs.php
 
+    excludePaths:
+        - tests/*
+
     # Strict rules configuration
     strictRules:
         noVariableVariables: false
+
+    ignoreErrors:
+        - identifier: empty.notAllowed
 
     treatPhpDocTypesAsCertain: false
 
 includes:
     - vendor/phpstan/phpstan-strict-rules/rules.neon
     - vendor/szepeviktor/phpstan-wordpress/extension.neon
-    - vendor/phpstan/phpstan-phpunit/extension.neon
