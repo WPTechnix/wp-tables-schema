@@ -14,6 +14,8 @@ namespace WPTechnix\WP_Tables_Schema\Constants;
  * Index Type Constants
  *
  * @package WPTechnix\WP_Tables_Schema\Constants
+ *
+ * @phpstan-type Index_Types_Excluding_Primary Index_Type::INDEX | Index_Type::UNIQUE | Index_Type::FULLTEXT | Index_Type::SPATIAL
  */
 final class Index_Type {
 
@@ -35,20 +37,16 @@ final class Index_Type {
 	 * @param bool $include_primary If true, the PRIMARY type will be included in the list.
 	 *
 	 * @return array A list of index type constants.
-	 * @phpstan-return list<self::*>
+	 *
+	 * @phpstan-return ( $include_primary is true ? list<self::*> : list<Index_Types_Excluding_Primary> )
 	 */
 	public static function get_all( bool $include_primary = true ): array {
-		$types = [
+		return [
 			self::INDEX,
 			self::UNIQUE,
 			self::FULLTEXT,
 			self::SPATIAL,
+			...( $include_primary ? [ self::PRIMARY ] : [] ),
 		];
-
-		if ( $include_primary ) {
-			$types[] = self::PRIMARY;
-		}
-
-		return $types;
 	}
 }

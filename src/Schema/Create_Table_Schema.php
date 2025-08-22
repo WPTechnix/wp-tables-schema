@@ -1048,17 +1048,22 @@ final class Create_Table_Schema {
 	 * @phpstan-param Supported_Index_Type $type
 	 *
 	 * @return Index_Definition
-	 *
-	 * @throws Schema_Exception If schema is compiled or parameters are invalid.
 	 */
-	private function add_index(
+	public function add_index(
 		string|array $columns,
 		?string $name = null,
 		string $type = Index_Type::INDEX,
 	): Index_Definition {
 
+		$prefix = match ( $type ) {
+			Index_Type::UNIQUE   => 'uq',
+			Index_Type::INDEX    => 'idx',
+			Index_Type::FULLTEXT => 'ft',
+			Index_Type::SPATIAL  => 'sp',
+		};
+
 		$columns = (array) $columns;
-		$name    = $name ?? Util::generate_identifier_name( $this->short_table_name, $columns, $type );
+		$name    = $name ?? Util::generate_identifier_name( $this->short_table_name, $columns, $prefix );
 		$index   = new Index_Definition( $name, $columns, $type );
 
 		$this->indexes[ $index->get_name() ] = $index;
@@ -1382,7 +1387,7 @@ final class Create_Table_Schema {
 
 			if ( $column->is_auto_increment() ) {
 				if ( null !== $auto_increment_column ) {
-					throw new Schema_Exception( 'A table can only have one auto-incrementing column' );
+					throw new Schema_Exception( 'A table can only have one auto-incrementing column.' );
 				}
 				$auto_increment_column = $column->get_name();
 			}

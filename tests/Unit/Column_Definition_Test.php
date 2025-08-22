@@ -17,10 +17,6 @@ use WPTechnix\WP_Tables_Schema\Util;
  * Column Definition Test
  *
  * @covers \WPTechnix\WP_Tables_Schema\Schema\Column_Definition
- *
- * Tests are grouped by the method they target. Each group typically contains
- * positive case tests (verifying correct behavior and SQL output) followed by
- * negative case tests (verifying exceptions for invalid usage).
  */
 final class Column_Definition_Test extends TestCase {
 

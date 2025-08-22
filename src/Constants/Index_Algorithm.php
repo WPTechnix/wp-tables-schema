@@ -29,6 +29,8 @@ final class Index_Algorithm {
 	 * Get all index algorithms.
 	 *
 	 * @return string[]
+	 *
+	 * @phpstan-return list<self::*>
 	 */
 	public static function get_all(): array {
 		return [

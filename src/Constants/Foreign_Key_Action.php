@@ -31,6 +31,8 @@ final class Foreign_Key_Action {
 	 * Get all actions.
 	 *
 	 * @return string[]
+	 *
+	 * @phpstan-return list<self::*>
 	 */
 	public static function get_all(): array {
 		return [

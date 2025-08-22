@@ -20,6 +20,8 @@ use WPTechnix\WP_Tables_Schema\Util;
  * @internal
  *
  * @package WPTechnix\WP_Tables_Schema\Schema
+ *
+ * @phpstan-import-type Index_Types_Excluding_Primary from Index_Type
  */
 final class Index_Definition {
 
@@ -43,7 +45,7 @@ final class Index_Definition {
 	 * The type of the index (e.g., INDEX, UNIQUE).
 	 *
 	 * @var string
-	 * @phpstan-var Index_Type::INDEX|Index_Type::UNIQUE|Index_Type::FULLTEXT|Index_Type::SPATIAL
+	 * @phpstan-var Index_Types_Excluding_Primary
 	 */
 	private string $type;
 
@@ -72,7 +74,7 @@ final class Index_Definition {
 	 *
 	 * @phpstan-param non-empty-string $name
 	 * @phpstan-param list<non-empty-string> $columns
-	 * @phpstan-param Index_Type::INDEX|Index_Type::UNIQUE|Index_Type::FULLTEXT|Index_Type::SPATIAL $type
+	 * @phpstan-param Index_Types_Excluding_Primary $type
 	 *
 	 * @throws Schema_Exception If any provided parameters are invalid.
 	 */
@@ -223,7 +225,7 @@ final class Index_Definition {
 	 *
 	 * @return string The index type (e.g., INDEX, UNIQUE).
 	 *
-	 * @phpstan-return Index_Type::INDEX|Index_Type::UNIQUE|Index_Type::FULLTEXT|Index_Type::SPATIAL
+	 * @phpstan-return Index_Types_Excluding_Primary
 	 */
 	public function get_type(): string {
 		return $this->type;
