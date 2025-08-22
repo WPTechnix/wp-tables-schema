@@ -1,11 +1,9 @@
 <?php
 /**
  * Tests for the Column_Definition class.
- *
- * @package WPTechnix\WP_Tables_Schema\Tests\Schema
  */
 
-namespace WPTechnix\WP_Tables_Schema\Tests\Schema;
+namespace WPTechnix\WP_Tables_Schema\Tests\Unit\Schema;
 
 use PHPUnit\Framework\TestCase;
 use WPTechnix\WP_Tables_Schema\Constants\Column_Type;
@@ -21,6 +19,8 @@ use WPTechnix\WP_Tables_Schema\Util;
 final class Column_Definition_Test extends TestCase {
 
 	/**
+	 * Tests that the constructor succeeds with valid inputs.
+	 *
 	 * @test
 	 */
 	public function test_constructor_succeeds_with_valid_inputs(): void {
@@ -30,6 +30,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the constructor throws an exception for an invalid name.
+	 *
 	 * @param string $invalid_name The invalid column name to test.
 	 *
 	 * @dataProvider invalid_identifier_provider
@@ -48,6 +50,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the constructor throws an exception for an invalid type.
+	 *
 	 * @test
 	 */
 	public function test_constructor_throws_on_invalid_type(): void {
@@ -57,6 +61,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the default() method succeeds with various data types.
+	 *
 	 * @param mixed  $value         The default value to set.
 	 * @param string $expected_sql  The expected SQL output for the default clause.
 	 *
@@ -70,6 +76,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the default() method correctly handles NULL literals.
+	 *
 	 * @test
 	 */
 	public function test_default_handles_null_literals_correctly(): void {
@@ -86,6 +94,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that setting CURRENT_TIMESTAMP as a default value succeeds.
+	 *
 	 * @test
 	 */
 	public function test_current_timestamp_as_default_succeeds(): void {
@@ -95,6 +105,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that default() throws an exception on unsupported column types.
+	 *
 	 * @test
 	 */
 	public function test_default_throws_on_unsupported_type(): void {
@@ -105,6 +117,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that setting a default of NULL throws an exception on a primary key.
+	 *
 	 * @test
 	 */
 	public function test_default_null_throws_on_primary_key(): void {
@@ -115,6 +129,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the nullable() method succeeds.
+	 *
 	 * @test
 	 */
 	public function test_nullable_succeeds(): void {
@@ -125,6 +141,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that nullable() throws an exception when conflicting with other attributes.
+	 *
 	 * @param string $conflicting_method The method that conflicts with nullable().
 	 * @param string $expected_message   The expected exception message.
 	 *
@@ -140,6 +158,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that nullable() throws an exception on a spatial key column.
+	 *
 	 * @test
 	 */
 	public function test_nullable_throws_on_spatial_key(): void {
@@ -150,6 +170,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that primary() throws an exception when the column is already nullable.
+	 *
 	 * @test
 	 */
 	public function test_primary_throws_when_already_nullable(): void {
@@ -160,6 +182,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the auto_increment() method succeeds.
+	 *
 	 * @test
 	 */
 	public function test_auto_increment_succeeds(): void {
@@ -169,6 +193,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that auto_increment() throws an exception when conflicting with other attributes.
+	 *
 	 * @param callable $setup_action      A function to set up the conflicting state.
 	 * @param string   $expected_message  The expected exception message.
 	 *
@@ -184,6 +210,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that auto_increment() throws an exception on non-integer column types.
+	 *
 	 * @test
 	 */
 	public function test_auto_increment_throws_on_non_integer_type(): void {
@@ -194,6 +222,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that unsigned() succeeds on numeric column types.
+	 *
 	 * @test
 	 */
 	public function test_unsigned_succeeds_on_numeric_type(): void {
@@ -203,6 +233,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that unsigned() throws an exception on non-numeric column types.
+	 *
 	 * @test
 	 */
 	public function test_unsigned_throws_on_non_numeric_type(): void {
@@ -213,6 +245,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that on_update_current_timestamp() succeeds on valid column types.
+	 *
 	 * @test
 	 */
 	public function test_on_update_current_timestamp_succeeds_on_valid_type(): void {
@@ -222,6 +256,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that on_update_current_timestamp() throws an exception on invalid column types.
+	 *
 	 * @test
 	 */
 	public function test_on_update_current_timestamp_throws_on_invalid_type(): void {
@@ -232,6 +268,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that charset() and collate() succeed on string column types.
+	 *
 	 * @test
 	 */
 	public function test_charset_and_collate_succeed_on_string_type(): void {
@@ -244,6 +282,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that charset() throws an exception on non-string column types.
+	 *
 	 * @test
 	 */
 	public function test_charset_throws_on_non_string_type(): void {
@@ -253,6 +293,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that collate() throws an exception on non-string column types.
+	 *
 	 * @test
 	 */
 	public function test_collate_throws_on_non_string_type(): void {
@@ -262,6 +304,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that charset() throws an exception for an empty string.
+	 *
 	 * @test
 	 */
 	public function test_charset_throws_on_empty_string(): void {
@@ -271,6 +315,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that collate() throws an exception for an empty string.
+	 *
 	 * @test
 	 */
 	public function test_collate_throws_on_empty_string(): void {
@@ -280,6 +326,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the comment() method succeeds.
+	 *
 	 * @test
 	 */
 	public function test_comment_succeeds(): void {
@@ -289,6 +337,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the index-related methods set the column state correctly.
+	 *
 	 * @test
 	 */
 	public function test_index_methods_set_state_correctly(): void {
@@ -302,6 +352,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that index-related methods throw an exception for an invalid key name.
+	 *
 	 * @param string $method_name The name of the index method to call.
 	 * @param string $key_type    The SQL keyword for the key type.
 	 *
@@ -321,6 +373,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that specialized index methods throw on invalid column types.
+	 *
 	 * @param string $method_name      The specialized index method to call.
 	 * @param string $column_type      The invalid column type to test with.
 	 * @param string $expected_message The expected exception message.
@@ -336,6 +390,8 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests the to_sql() method with a combination of all attributes.
+	 *
 	 * @test
 	 */
 	public function test_to_sql_with_all_attributes(): void {
@@ -351,6 +407,8 @@ final class Column_Definition_Test extends TestCase {
 
 	/**
 	 * Data provider for default values.
+	 *
+	 * @return array<string, array<mixed>>
 	 */
 	public function default_value_provider(): array {
 		return [
@@ -364,6 +422,8 @@ final class Column_Definition_Test extends TestCase {
 
 	/**
 	 * Data provider for invalid SQL identifiers.
+	 *
+	 * @return array<string, array<string>>
 	 */
 	public function invalid_identifier_provider(): array {
 		return [
@@ -374,7 +434,9 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
-	 * Data provider for nullable conflicts.
+	 * Data provider for nullable() conflicts.
+	 *
+	 * @return array<string, array<string>>
 	 */
 	public function nullable_conflict_provider(): array {
 		return [
@@ -384,7 +446,9 @@ final class Column_Definition_Test extends TestCase {
 	}
 
 	/**
-	 * Data provider for auto_increment conflicts.
+	 * Data provider for auto_increment() conflicts.
+	 *
+	 * @return array<string, array<mixed>>
 	 */
 	public function auto_increment_conflict_provider(): array {
 		return [
@@ -401,6 +465,8 @@ final class Column_Definition_Test extends TestCase {
 
 	/**
 	 * Data provider for index methods.
+	 *
+	 * @return array<string, array<string>>
 	 */
 	public function index_method_provider(): array {
 		return [
@@ -413,6 +479,8 @@ final class Column_Definition_Test extends TestCase {
 
 	/**
 	 * Data provider for specialized index type conflicts.
+	 *
+	 * @return array<string, array<string>>
 	 */
 	public function specialized_index_provider(): array {
 		return [

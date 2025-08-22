@@ -1,11 +1,9 @@
 <?php
 /**
  * Tests for the Create_Table_Schema class.
- *
- * @package WPTechnix\WP_Tables_Schema\Tests\Schema
  */
 
-namespace WPTechnix\WP_Tables_Schema\Tests\Schema;
+namespace WPTechnix\WP_Tables_Schema\Tests\Unit\Schema;
 
 use PHPUnit\Framework\TestCase;
 use WPTechnix\WP_Tables_Schema\Exceptions\Schema_Exception;
@@ -19,6 +17,8 @@ use WPTechnix\WP_Tables_Schema\Schema\Create_Table_Schema;
 final class Create_Table_Schema_Test extends TestCase {
 
 	/**
+	 * Tests that the constructor succeeds with valid table names.
+	 *
 	 * @test
 	 */
 	public function test_constructor_succeeds_with_valid_names(): void {
@@ -32,6 +32,8 @@ final class Create_Table_Schema_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the constructor throws an exception for an invalid table name.
+	 *
 	 * @test
 	 */
 	public function test_constructor_throws_on_invalid_table_name(): void {
@@ -41,6 +43,8 @@ final class Create_Table_Schema_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the constructor throws an exception for an invalid short table name.
+	 *
 	 * @test
 	 */
 	public function test_constructor_throws_on_invalid_short_table_name(): void {
@@ -50,6 +54,8 @@ final class Create_Table_Schema_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the id() macro creates a correct primary key column.
+	 *
 	 * @test
 	 */
 	public function test_id_macro_creates_correct_primary_key_column(): void {
@@ -61,6 +67,8 @@ final class Create_Table_Schema_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the timestamps() macro adds created_at and updated_at columns.
+	 *
 	 * @test
 	 */
 	public function test_timestamps_macro_adds_datetime_columns(): void {
@@ -74,6 +82,8 @@ final class Create_Table_Schema_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the morphs() macro adds polymorphic columns and an index.
+	 *
 	 * @test
 	 */
 	public function test_morphs_macro_adds_columns_and_index(): void {
@@ -88,6 +98,8 @@ final class Create_Table_Schema_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that various table options are correctly reflected in the final SQL.
+	 *
 	 * @test
 	 */
 	public function test_table_options_are_reflected_in_sql(): void {
@@ -111,6 +123,8 @@ final class Create_Table_Schema_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that column-level index intents are compiled into table indexes.
+	 *
 	 * @test
 	 */
 	public function test_compile_translates_column_index_intents_to_table_indexes(): void {
@@ -126,6 +140,8 @@ final class Create_Table_Schema_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that to_sql() throws an exception when the table has no columns.
+	 *
 	 * @test
 	 */
 	public function test_to_sql_throws_with_no_columns(): void {
@@ -136,6 +152,8 @@ final class Create_Table_Schema_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that to_sql() throws if an index references a non-existent column.
+	 *
 	 * @test
 	 */
 	public function test_to_sql_throws_if_index_references_non_existent_column(): void {
@@ -148,6 +166,8 @@ final class Create_Table_Schema_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that to_sql() throws if a foreign key references a non-existent local column.
+	 *
 	 * @test
 	 */
 	public function test_to_sql_throws_if_foreign_key_references_non_existent_local_column(): void {
@@ -160,6 +180,8 @@ final class Create_Table_Schema_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that to_sql() throws an exception with multiple primary keys defined.
+	 *
 	 * @test
 	 */
 	public function test_to_sql_throws_with_multiple_primary_keys(): void {
@@ -172,6 +194,8 @@ final class Create_Table_Schema_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that to_sql() throws an exception with multiple auto-increment columns defined.
+	 *
 	 * @test
 	 */
 	public function test_to_sql_throws_with_multiple_auto_increment_columns(): void {
@@ -184,6 +208,8 @@ final class Create_Table_Schema_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that to_sql() throws if an auto-increment column is not a key.
+	 *
 	 * @test
 	 */
 	public function test_to_sql_throws_if_auto_increment_is_not_on_key(): void {
@@ -195,6 +221,8 @@ final class Create_Table_Schema_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that to_sql() throws if an auto-increment column is not the first in a unique key.
+	 *
 	 * @test
 	 */
 	public function test_to_sql_throws_if_auto_increment_is_not_first_in_unique_key(): void {
@@ -208,6 +236,8 @@ final class Create_Table_Schema_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that to_sql() succeeds if an auto-increment column is a primary key.
+	 *
 	 * @test
 	 */
 	public function test_to_sql_succeeds_if_auto_increment_is_on_primary_key(): void {
@@ -219,6 +249,8 @@ final class Create_Table_Schema_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that to_sql() succeeds if an auto-increment column is the first in a unique key.
+	 *
 	 * @test
 	 */
 	public function test_to_sql_succeeds_if_auto_increment_is_on_first_col_of_unique_key(): void {

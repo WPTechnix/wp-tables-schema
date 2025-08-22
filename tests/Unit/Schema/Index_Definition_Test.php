@@ -3,7 +3,7 @@
  * Tests for the Index_Definition class.
  */
 
-namespace WPTechnix\WP_Tables_Schema\Tests\Schema;
+namespace WPTechnix\WP_Tables_Schema\Tests\Unit\Schema;
 
 use PHPUnit\Framework\TestCase;
 use WPTechnix\WP_Tables_Schema\Constants\Index_Algorithm;
@@ -20,8 +20,9 @@ use WPTechnix\WP_Tables_Schema\Util;
 final class Index_Definition_Test extends TestCase {
 
 	/**
+	 * Tests that the constructor succeeds and getters work correctly.
+	 *
 	 * @test
-	 * @group constructor
 	 */
 	public function test_constructor_succeeds_and_getters_work(): void {
 		$index = new Index_Definition( 'idx_email', [ 'user_email' ], Index_Type::UNIQUE );
@@ -32,8 +33,9 @@ final class Index_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the constructor defaults to the standard index type.
+	 *
 	 * @test
-	 * @group constructor
 	 */
 	public function test_constructor_defaults_to_standard_index_type(): void {
 		$index = new Index_Definition( 'idx_user_id', [ 'user_id' ] );
@@ -41,11 +43,12 @@ final class Index_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the constructor throws an exception for an invalid index name.
+	 *
 	 * @param string $invalid_name The invalid index name to test.
 	 *
 	 * @dataProvider invalid_identifier_provider
 	 * @test
-	 * @group constructor
 	 */
 	public function test_constructor_throws_on_invalid_index_name( string $invalid_name ): void {
 		$this->expectException( Schema_Exception::class );
@@ -60,8 +63,9 @@ final class Index_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the constructor throws an exception when the columns array is empty.
+	 *
 	 * @test
-	 * @group constructor
 	 */
 	public function test_constructor_throws_on_empty_columns(): void {
 		$this->expectException( Schema_Exception::class );
@@ -70,8 +74,9 @@ final class Index_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the constructor throws an exception for an invalid index type.
+	 *
 	 * @test
-	 * @group constructor
 	 */
 	public function test_constructor_throws_on_invalid_type(): void {
 		$this->expectException( Schema_Exception::class );
@@ -80,11 +85,12 @@ final class Index_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the constructor throws an exception for an invalid column name.
+	 *
 	 * @param string $invalid_column The invalid column name to test.
 	 *
 	 * @dataProvider invalid_identifier_provider
 	 * @test
-	 * @group constructor
 	 */
 	public function test_constructor_throws_on_invalid_column_name( string $invalid_column ): void {
 		$this->expectException( Schema_Exception::class );
@@ -93,10 +99,11 @@ final class Index_Definition_Test extends TestCase {
 	}
 
 	/**
-	 * [NEW] This test covers the specific `is_string() ? $column : 'NOT_A_STRING'` path.
+	 * Tests that the constructor throws an exception for a non-string value in the columns array.
+	 *
+	 * This test covers the specific `is_string() ? $column : 'NOT_A_STRING'` path.
 	 *
 	 * @test
-	 * @group constructor
 	 */
 	public function test_constructor_throws_on_non_string_in_columns_array(): void {
 		$this->expectException( Schema_Exception::class );
@@ -105,8 +112,9 @@ final class Index_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the 'using' method succeeds with a valid algorithm.
+	 *
 	 * @test
-	 * @group fluent
 	 */
 	public function test_using_succeeds_with_valid_algorithm(): void {
 		$index = new Index_Definition( 'idx_test', [ 'column1' ] );
@@ -116,8 +124,9 @@ final class Index_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the 'using' method throws an exception for an invalid algorithm.
+	 *
 	 * @test
-	 * @group fluent
 	 */
 	public function test_using_throws_on_invalid_algorithm(): void {
 		$this->expectException( Schema_Exception::class );
@@ -127,8 +136,9 @@ final class Index_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the 'length' method succeeds with valid inputs.
+	 *
 	 * @test
-	 * @group fluent
 	 */
 	public function test_length_succeeds_with_valid_inputs(): void {
 		$index = new Index_Definition( 'idx_test', [ 'varchar_col', 'text_col' ] );
@@ -140,8 +150,9 @@ final class Index_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the 'length' method throws an exception for a non-existent column.
+	 *
 	 * @test
-	 * @group fluent
 	 */
 	public function test_length_throws_on_non_existent_column(): void {
 		$this->expectException( Schema_Exception::class );
@@ -151,11 +162,12 @@ final class Index_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the 'length' method coerces invalid lengths to 1.
+	 *
 	 * @param int $input_length The length value to test.
 	 *
 	 * @dataProvider zero_and_negative_length_provider
 	 * @test
-	 * @group fluent
 	 */
 	public function test_length_coerces_invalid_length_to_one( int $input_length ): void {
 		$index = new Index_Definition( 'idx_test', [ 'column1' ] );
@@ -164,12 +176,13 @@ final class Index_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that 'to_sql' generates correct syntax for all index types.
+	 *
 	 * @param string $type         The index type from Index_Type constants.
 	 * @param string $expected_sql The expected SQL keyword string.
 	 *
 	 * @dataProvider index_type_provider
 	 * @test
-	 * @group sql
 	 */
 	public function test_to_sql_generates_correct_syntax_for_all_types( string $type, string $expected_sql ): void {
 		$index = new Index_Definition( 'idx_test', [ 'column1' ], $type );
@@ -177,8 +190,9 @@ final class Index_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests 'to_sql' with a more complex index definition.
+	 *
 	 * @test
-	 * @group sql
 	 */
 	public function test_to_sql_for_complex_index(): void {
 		$index = new Index_Definition( 'idx_complex', [ 'col_a', 'col_b' ], Index_Type::UNIQUE );
@@ -189,6 +203,8 @@ final class Index_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Data provider for invalid SQL identifiers.
+	 *
 	 * @return array<string, array<string>>
 	 */
 	public function invalid_identifier_provider(): array {
@@ -201,6 +217,8 @@ final class Index_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Data provider for zero and negative length values.
+	 *
 	 * @return array<string, array<int>>
 	 */
 	public function zero_and_negative_length_provider(): array {
@@ -211,6 +229,8 @@ final class Index_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Data provider for index types and their expected SQL keywords.
+	 *
 	 * @return array<string, array<string>>
 	 */
 	public function index_type_provider(): array {

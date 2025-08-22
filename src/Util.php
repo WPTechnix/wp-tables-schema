@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace WPTechnix\WP_Tables_Schema;
 
-use WPTechnix\WP_Tables_Schema\Constants\Index_Type;
-
 /**
  * A collection of utility functions.
  *

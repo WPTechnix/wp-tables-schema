@@ -3,7 +3,7 @@
  * Foreign Key Definition Test
  */
 
-namespace WPTechnix\WP_Tables_Schema\Tests\Schema;
+namespace WPTechnix\WP_Tables_Schema\Tests\Unit\Schema;
 
 use PHPUnit\Framework\TestCase;
 use WPTechnix\WP_Tables_Schema\Constants\Foreign_Key_Action;
@@ -19,8 +19,9 @@ use WPTechnix\WP_Tables_Schema\Util;
 final class Foreign_Key_Definition_Test extends TestCase {
 
 	/**
+	 * Tests that the constructor succeeds with both string and array column definitions.
+	 *
 	 * @test
-	 * @group constructor
 	 */
 	public function test_constructor_succeeds_with_string_and_array_columns(): void {
 		$fk_string = new Foreign_Key_Definition( 'fk_user_id', 'user_id' );
@@ -33,11 +34,12 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the constructor throws an exception for an invalid constraint name.
+	 *
 	 * @param string $invalid_name The invalid name to test.
 	 *
 	 * @dataProvider invalid_identifier_provider
 	 * @test
-	 * @group constructor
 	 */
 	public function test_constructor_throws_on_invalid_constraint_name( string $invalid_name ): void {
 		$this->expectException( Schema_Exception::class );
@@ -52,8 +54,9 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the constructor throws an exception for an empty columns array.
+	 *
 	 * @test
-	 * @group constructor
 	 */
 	public function test_constructor_throws_on_empty_columns_array(): void {
 		$this->expectException( Schema_Exception::class );
@@ -62,11 +65,12 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the constructor throws an exception for an invalid column name.
+	 *
 	 * @param string $invalid_column Invalid column name.
 	 *
 	 * @dataProvider invalid_identifier_provider
 	 * @test
-	 * @group constructor
 	 */
 	public function test_constructor_throws_on_invalid_column_name( string $invalid_column ): void {
 		$this->expectException( Schema_Exception::class );
@@ -75,10 +79,11 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
-	 * [NEW] This test covers the specific `is_string() ? $column : 'NOT_A_STRING'` path.
+	 * Tests that the constructor throws an exception for a non-string value in the columns array.
+	 *
+	 * This test covers the specific `is_string() ? $column : 'NOT_A_STRING'` path.
 	 *
 	 * @test
-	 * @group constructor
 	 */
 	public function test_constructor_throws_on_non_string_in_columns_array(): void {
 		$this->expectException( Schema_Exception::class );
@@ -87,8 +92,9 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the references() method succeeds and defaults to the 'id' column.
+	 *
 	 * @test
-	 * @group references
 	 */
 	public function test_references_succeeds_and_defaults_to_id_column(): void {
 		$fk_explicit = new Foreign_Key_Definition( 'fk_post_author', 'author_id' );
@@ -103,8 +109,9 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that references() throws an exception for an invalid table name.
+	 *
 	 * @test
-	 * @group references
 	 */
 	public function test_references_throws_on_invalid_table_name(): void {
 		$this->expectException( Schema_Exception::class );
@@ -114,8 +121,9 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that references() throws an exception for an invalid column name.
+	 *
 	 * @test
-	 * @group references
 	 */
 	public function test_references_throws_on_invalid_column_name(): void {
 		$this->expectException( Schema_Exception::class );
@@ -125,10 +133,11 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
-	 * [NEW] This test covers the case where an empty array is explicitly passed to references().
+	 * Tests that references() throws an exception for an empty referenced columns array.
+	 *
+	 * This test covers the case where an empty array is explicitly passed to references().
 	 *
 	 * @test
-	 * @group references
 	 */
 	public function test_references_throws_for_empty_columns_array(): void {
 		$this->expectException( Schema_Exception::class );
@@ -138,8 +147,9 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the on_delete() and on_update() methods succeed.
+	 *
 	 * @test
-	 * @group actions
 	 */
 	public function test_on_delete_and_on_update_succeed(): void {
 		$fk = new Foreign_Key_Definition( 'fk_user_id', 'user_id' );
@@ -152,8 +162,9 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that actions are case-insensitive and whitespace is trimmed.
+	 *
 	 * @test
-	 * @group actions
 	 */
 	public function test_actions_are_case_insensitive_and_trimmed(): void {
 		$fk = new Foreign_Key_Definition( 'fk_user_id', 'user_id' );
@@ -166,8 +177,9 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that on_delete() throws an exception for an invalid action.
+	 *
 	 * @test
-	 * @group actions
 	 */
 	public function test_on_delete_throws_on_invalid_action(): void {
 		$this->expectException( Schema_Exception::class );
@@ -177,8 +189,9 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that on_update() throws an exception for an invalid action.
+	 *
 	 * @test
-	 * @group actions
 	 */
 	public function test_on_update_throws_on_invalid_action(): void {
 		$this->expectException( Schema_Exception::class );
@@ -188,8 +201,9 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that the shorthand action methods succeed.
+	 *
 	 * @test
-	 * @group actions
 	 */
 	public function test_shorthand_methods_succeed(): void {
 		$fk_cascade = new Foreign_Key_Definition( 'fk_post_meta', 'post_id' );
@@ -204,8 +218,9 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that to_sql() succeeds for a composite foreign key.
+	 *
 	 * @test
-	 * @group sql
 	 */
 	public function test_to_sql_succeeds_for_composite_key(): void {
 		$fk = new Foreign_Key_Definition( 'fk_order_items', [ 'order_id', 'product_id' ] );
@@ -217,8 +232,9 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that to_sql() omits the RESTRICT action by default.
+	 *
 	 * @test
-	 * @group sql
 	 */
 	public function test_to_sql_omits_restrict_action_by_default(): void {
 		$fk = new Foreign_Key_Definition( 'fk_simple', 'col1' );
@@ -231,8 +247,9 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that to_sql() throws an exception if the definition is incomplete.
+	 *
 	 * @test
-	 * @group sql
 	 */
 	public function test_to_sql_throws_if_not_fully_configured(): void {
 		$this->expectException( Schema_Exception::class );
@@ -242,8 +259,9 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Tests that to_sql() throws an exception when local and referenced column counts mismatch.
+	 *
 	 * @test
-	 * @group sql
 	 */
 	public function test_to_sql_throws_on_column_count_mismatch(): void {
 		$this->expectException( Schema_Exception::class );
@@ -254,6 +272,8 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
+	 * Data provider for invalid SQL identifiers.
+	 *
 	 * @return array<string, array<string>>
 	 */
 	public function invalid_identifier_provider(): array {
