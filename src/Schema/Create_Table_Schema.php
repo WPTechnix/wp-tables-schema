@@ -3,7 +3,6 @@
  * Fluent interface for building `CREATE TABLE` SQL statements.
  *
  * @package WPTechnix\WP_Tables_Schema\Schema
- * @author  WPTechnix <developers@wptechnix.com>
  */
 
 declare(strict_types=1);
@@ -43,8 +42,6 @@ use WPTechnix\WP_Tables_Schema\Util;
  * @see \WPTechnix\WP_Tables_Schema\Schema\Foreign_Key_Definition
  *
  * @phpstan-type Supported_Index_Type = Index_Type::INDEX|Index_Type::UNIQUE|Index_Type::FULLTEXT|Index_Type::SPATIAL
- *
- * @package WPTechnix\WP_Tables_Schema\Schema
  */
 final class Create_Table_Schema {
 
@@ -320,25 +317,6 @@ final class Create_Table_Schema {
 		}
 
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::DECIMAL, [ $precision, $scale ] ) );
-	}
-
-	/**
-	 * Add a NUMERIC column (standard SQL synonym for DECIMAL).
-	 *
-	 * @param string $column_name The column name.
-	 * @param int    $precision   Total number of digits (1-65).
-	 * @param int    $scale       Digits after decimal point (0-30).
-	 *
-	 * @phpstan-param non-empty-string $column_name
-	 * @phpstan-param int<1, 65> $precision
-	 * @phpstan-param int<0, 30> $scale
-	 *
-	 * @return Column_Definition
-	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
-	 */
-	public function numeric( string $column_name, int $precision = 10, int $scale = 0 ): Column_Definition {
-		return $this->decimal( $column_name, $precision, $scale );
 	}
 
 	/**
@@ -1266,7 +1244,7 @@ final class Create_Table_Schema {
 
 		$options = [
 			"ENGINE={$this->engine}",
-			"DEFAULT CHARSET={$this->charset}",
+			"DEFAULT CHARACTER SET={$this->charset}",
 			"COLLATE={$this->collation}",
 		];
 

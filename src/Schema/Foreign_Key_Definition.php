@@ -15,8 +15,6 @@ use WPTechnix\WP_Tables_Schema\Util;
 
 /**
  * Encapsulates a foreign key constraint definition within a CREATE TABLE schema (InnoDB only).
- *
- * @package WPTechnix\WP_Tables_Schema\Schema
  */
 final class Foreign_Key_Definition {
 

@@ -116,7 +116,7 @@ final class Create_Table_Schema_Test extends TestCase {
 
 		self::assertStringStartsWith( 'CREATE TABLE IF NOT EXISTS', $sql );
 		self::assertStringContainsString( 'ENGINE=MyISAM', $sql );
-		self::assertStringContainsString( 'DEFAULT CHARSET=utf8', $sql );
+		self::assertStringContainsString( 'DEFAULT CHARACTER SET=utf8', $sql );
 		self::assertStringContainsString( 'COLLATE=utf8_general_ci', $sql );
 		self::assertStringContainsString( "COMMENT='My Test Table'", $sql );
 		self::assertStringContainsString( 'AUTO_INCREMENT=1000', $sql );

@@ -321,7 +321,7 @@ final class Column_Definition_Test extends TestCase {
 	 */
 	public function test_collate_throws_on_empty_string(): void {
 		$this->expectException( Schema_Exception::class );
-		$this->expectExceptionMessage( 'Empty Collation provided for column "col".' );
+		$this->expectExceptionMessage( 'Empty collation provided for column "col".' );
 		( new Column_Definition( 'col', Column_Type::VARCHAR ) )->collate( ' ' );
 	}
 

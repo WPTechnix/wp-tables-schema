@@ -16,8 +16,6 @@ use WPTechnix\WP_Tables_Schema\Util;
 /**
  * Provides the structure and constraints of a column within a CREATE TABLE schema.
  *
- * @package WPTechnix\WP_Tables_Schema\Schema
- *
  * @internal
  */
 final class Column_Definition {
@@ -273,7 +271,8 @@ final class Column_Definition {
 		$disallowed_types = array_merge(
 			Column_Type::get_text_types(),
 			Column_Type::get_blob_types(),
-			[ Column_Type::JSON, Column_Type::GEOMETRY ]
+			Column_Type::get_spatial_types(),
+			[ Column_Type::JSON ]
 		);
 
 		if ( in_array( $this->type, $disallowed_types, true ) ) {
@@ -639,7 +638,7 @@ final class Column_Definition {
 		if ( empty( $collation ) ) {
 			throw new Schema_Exception(
 				sprintf(
-					'Empty Collation provided for column "%s".',
+					'Empty collation provided for column "%s".',
 					$this->name
 				)
 			);

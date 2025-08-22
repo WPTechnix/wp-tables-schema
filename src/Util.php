@@ -11,8 +11,6 @@ namespace WPTechnix\WP_Tables_Schema;
 
 /**
  * A collection of utility functions.
- *
- * @package WPTechnix\WP_Tables_Schema
  */
 final class Util {
 

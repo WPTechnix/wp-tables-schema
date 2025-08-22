@@ -12,8 +12,6 @@ namespace WPTechnix\WP_Tables_Schema\Constants;
 /**
  * Column Type Constants
  *
- * @package WPTechnix\WP_Tables_Schema\Constants
- *
  * @phpstan-type Column_Type_Integer self::TINYINT | self::SMALLINT | self::MEDIUMINT | self::INT | self::INTEGER | self::BIGINT
  * @phpstan-type Column_Type_Double self::DECIMAL | self::NUMERIC | self::FLOAT | self::DOUBLE
  * @phpstan-type Column_Type_Numeric Column_Type_Integer | Column_Type_Double
@@ -81,7 +79,7 @@ final class Column_Type {
 	/**
 	 * Get all defined column types.
 	 *
-	 * @return list<string> An array of all column type constants.
+	 * @return string[] An array of all column type constants.
 	 *
 	 * @phpstan-return list<self::*>
 	 */
@@ -102,24 +100,24 @@ final class Column_Type {
 	/**
 	 * Get all integer column types.
 	 *
-	 * @return list<string> An array of integer type constants.
+	 * @return string[] An array of integer type constants.
 	 * @phpstan-return list<Column_Type_Integer>
 	 */
 	public static function get_integer_types(): array {
 		return [
 			self::TINYINT,
-			self::BIGINT,
 			self::SMALLINT,
-			self::INTEGER,
 			self::MEDIUMINT,
 			self::INT,
+			self::INTEGER,
+			self::BIGINT,
 		];
 	}
 
 	/**
 	 * Get all double/floating-point column types.
 	 *
-	 * @return list<string> An array of double type constants.
+	 * @return string[] An array of double type constants.
 	 * @phpstan-return list<Column_Type_Double>
 	 */
 	public static function get_double_types(): array {
@@ -134,7 +132,7 @@ final class Column_Type {
 	/**
 	 * Get all numeric column types.
 	 *
-	 * @return list<string> An array of numeric type constants.
+	 * @return string[] An array of numeric type constants.
 	 * @phpstan-return list<Column_Type_Numeric>
 	 */
 	public static function get_numeric_types(): array {
@@ -144,7 +142,7 @@ final class Column_Type {
 	/**
 	 * Get text-based column types (excluding CHAR and VARCHAR).
 	 *
-	 * @return list<string> An array of text type constants.
+	 * @return string[] An array of text type constants.
 	 * @phpstan-return list<Column_Type_Text>
 	 */
 	public static function get_text_types(): array {
@@ -161,7 +159,7 @@ final class Column_Type {
 	 *
 	 * @param bool $include_text_types Whether to include text types (TINYTEXT, TEXT, etc.). Default true.
 	 *
-	 * @return list<string> An array of string type constants.
+	 * @return string[] An array of string type constants.
 	 * @phpstan-return ($include_text_types is true ? list<Column_Type_String> : list<Column_Type_Basic_String>)
 	 */
 	public static function get_string_types( bool $include_text_types = true ): array {
@@ -175,7 +173,7 @@ final class Column_Type {
 	/**
 	 * Get all date and time related column types.
 	 *
-	 * @return list<string> An array of date and time type constants.
+	 * @return string[] An array of date and time type constants.
 	 * @phpstan-return list<Column_Type_Date>
 	 */
 	public static function get_date_types(): array {
@@ -191,7 +189,7 @@ final class Column_Type {
 	/**
 	 * Get all BLOB (Binary Large Object) column types.
 	 *
-	 * @return list<string> An array of BLOB type constants.
+	 * @return string[] An array of BLOB type constants.
 	 * @phpstan-return list<Column_Type_Blob>
 	 */
 	public static function get_blob_types(): array {
@@ -207,7 +205,7 @@ final class Column_Type {
 	 * Get all binary string column types.
 	 *
 	 * @param bool $include_blobs Whether to include BLOB types. Default true.
-	 * @return list<string> An array of binary type constants.
+	 * @return string[] An array of binary type constants.
 	 * @phpstan-return ($include_blobs is true ? list<Column_Type_Binary> : list<Column_Type_Binary_String>)
 	 */
 	public static function get_binary_types( bool $include_blobs = true ): array {
@@ -221,7 +219,7 @@ final class Column_Type {
 	/**
 	 * Get all spatial (GIS) column types.
 	 *
-	 * @return list<string> An array of spatial type constants.
+	 * @return string[] An array of spatial type constants.
 	 * @phpstan-return list<Column_Type_Spatial>
 	 */
 	public static function get_spatial_types(): array {

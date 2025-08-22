@@ -11,8 +11,6 @@ namespace WPTechnix\WP_Tables_Schema\Constants;
 
 /**
  * Foreign key actions constants
- *
- * @package WPTechnix\WP_Tables_Schema\Constants
  */
 final class Foreign_Key_Action {
 

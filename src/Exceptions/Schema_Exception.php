@@ -13,8 +13,6 @@ use Exception;
 
 /**
  * Exception thrown when schema validation fails.
- *
- * @package WPTechnix\WP_Tables_Schema\Exceptions
  */
 class Schema_Exception extends Exception {
 }

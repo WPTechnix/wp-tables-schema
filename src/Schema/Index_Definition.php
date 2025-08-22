@@ -19,8 +19,6 @@ use WPTechnix\WP_Tables_Schema\Util;
  *
  * @internal
  *
- * @package WPTechnix\WP_Tables_Schema\Schema
- *
  * @phpstan-import-type Index_Types_Excluding_Primary from Index_Type
  */
 final class Index_Definition {

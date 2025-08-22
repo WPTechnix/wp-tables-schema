@@ -3,7 +3,6 @@
  * Index Type Constants
  *
  * @package WPTechnix\WP_Tables_Schema\Constants
- * @author  WPTechnix <developers@wptechnix.com>
  */
 
 declare(strict_types=1);
@@ -13,15 +12,13 @@ namespace WPTechnix\WP_Tables_Schema\Constants;
 /**
  * Index Type Constants
  *
- * @package WPTechnix\WP_Tables_Schema\Constants
- *
- * @phpstan-type Index_Types_Excluding_Primary Index_Type::INDEX | Index_Type::UNIQUE | Index_Type::FULLTEXT | Index_Type::SPATIAL
+ * @phpstan-type Index_Types_Excluding_Primary Index_Type::PRIMARY | Index_Type::UNIQUE | Index_Type::INDEX | Index_Type::FULLTEXT | Index_Type::SPATIAL
  */
 final class Index_Type {
 
-	public const INDEX    = 'INDEX';
 	public const PRIMARY  = 'PRIMARY';
 	public const UNIQUE   = 'UNIQUE';
+	public const INDEX    = 'INDEX';
 	public const FULLTEXT = 'FULLTEXT';
 	public const SPATIAL  = 'SPATIAL';
 
@@ -42,11 +39,11 @@ final class Index_Type {
 	 */
 	public static function get_all( bool $include_primary = true ): array {
 		return [
-			self::INDEX,
+			...( $include_primary ? [ self::PRIMARY ] : [] ),
 			self::UNIQUE,
+			self::INDEX,
 			self::FULLTEXT,
 			self::SPATIAL,
-			...( $include_primary ? [ self::PRIMARY ] : [] ),
 		];
 	}
 }

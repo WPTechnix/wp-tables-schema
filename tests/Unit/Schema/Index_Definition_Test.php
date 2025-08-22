@@ -80,7 +80,7 @@ final class Index_Definition_Test extends TestCase {
 	 */
 	public function test_constructor_throws_on_invalid_type(): void {
 		$this->expectException( Schema_Exception::class );
-		$this->expectExceptionMessage( 'The specified index type "INVALID_TYPE" is not valid. Please use one of: "INDEX", "UNIQUE", "FULLTEXT", "SPATIAL".' );
+		$this->expectExceptionMessage( 'The specified index type "INVALID_TYPE" is not valid. Please use one of: "UNIQUE", "INDEX", "FULLTEXT", "SPATIAL".' );
 		new Index_Definition( 'idx_test', [ 'column1' ], 'INVALID_TYPE' );
 	}
 

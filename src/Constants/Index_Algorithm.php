@@ -11,8 +11,6 @@ namespace WPTechnix\WP_Tables_Schema\Constants;
 
 /**
  * Index Algorithm Constants
- *
- * @package WPTechnix\WP_Tables_Schema\Constants
  */
 final class Index_Algorithm {
 
