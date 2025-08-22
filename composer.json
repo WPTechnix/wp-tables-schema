@@ -28,7 +28,6 @@
         "php-stubs/wordpress-tests-stubs": "^6.8",
         "phpcompatibility/php-compatibility": "*",
         "phpstan/phpstan": "^2.1",
-        "phpstan/phpstan-phpunit": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpunit/phpunit": "^9.6",
         "squizlabs/php_codesniffer": "^3",

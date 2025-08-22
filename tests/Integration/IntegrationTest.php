@@ -8,17 +8,16 @@ use WP_UnitTestCase;
 
 /**
  * Integration Test
- * 
+ *
  * @coversNothing
  */
-class IntegrationTest extends WP_UnitTestCase
-{
-    /**
-     * Sample test method.
-     */
-    public function testSample(): void
-    {
-        // @phpstan-ignore-next-line
-        $this->assertTrue(true);
-    }
+class IntegrationTest extends WP_UnitTestCase {
+
+	/**
+	 * Sample test method.
+	 */
+	public function testSample(): void {
+		// @phpstan-ignore-next-line
+		$this->assertTrue( true );
+	}
 }
