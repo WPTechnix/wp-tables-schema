@@ -12,11 +12,13 @@
 
 # Exclude from GitHub language stats
 /.github/** linguist-documentation
+/docs/** linguist-vendored
 
 # Exclude from GitHub-generated ZIP archives
 /tests                export-ignore
 /docker               export-ignore
 /bin                  export-ignore
+/docs                 export-ignore
 /.git*                export-ignore
 /.husky               export-ignore
 /package.json         export-ignore
