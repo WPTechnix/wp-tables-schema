@@ -12,7 +12,9 @@
 
 # Exclude from GitHub language stats
 /.github/** linguist-documentation
-/docs/** linguist-vendored
+/docs/**    linguist-documentation
+/bin/**     linguist-vendored
+/docker/**  linguist-vendored
 
 # Exclude from GitHub-generated ZIP archives
 /tests                export-ignore
