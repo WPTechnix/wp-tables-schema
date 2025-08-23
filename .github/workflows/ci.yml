@@ -216,6 +216,12 @@ jobs:
             db-name: MariaDB 10.1
           - db-image: mariadb:10.2
             db-name: MariaDB 10.2
+          - db-image: mariadb:10.3
+            db-name: MariaDB 10.3
+          - db-image: mariadb:10.4
+            db-name: MariaDB 10.4
+          - db-image: mariadb:10.5
+            db-name: MariaDB 10.5
           - db-image: mariadb:10.11
             db-name: MariaDB 10.11
     services:
