@@ -21,6 +21,7 @@ use LogicException;
 use wpdb;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use WPTechnix\WP_Tables_Schema\Constants\Index_Type;
 use WPTechnix\WP_Tables_Schema\Exceptions\Schema_Exception;
 use WPTechnix\WP_Tables_Schema\Interfaces\Table_Interface;
 use WPTechnix\WP_Tables_Schema\Schema\Create_Table_Schema;
@@ -35,44 +36,18 @@ use WPTechnix\WP_Tables_Schema\Schema\Create_Table_Schema;
  * API for all index and column manipulations.
  *
  * Requires PHP: 8.0+
- * Requires MySQL: 5.7+ or MariaDB 10.2+
+ * Requires MySQL: 5.6+ or MariaDB 10.1+
  *
  * @package WPTechnix\WP_Tables_Schema
  *
  * @phpstan-type IndexCacheRow array{Non_unique: '0'|'1', Key_name: non-empty-string, Index_type: string}
- * @phpstan-type CreateTableClosure (Closure(Create_Table_Schema): (Create_Table_Schema|string|non-empty-string))
+ * @phpstan-type create_tableClosure (Closure(Create_Table_Schema): (Create_Table_Schema|string|non-empty-string))
+ *
+ * @phpstan-import-type Index_Types_Excluding_Primary from Index_Type
  */
 abstract class Table implements Table_Interface, LoggerAwareInterface {
 
 	use LoggerAwareTrait;
-
-	/**
-	 * A standard, non-unique index.
-	 *
-	 * @var string
-	 */
-	public const INDEX_TYPE_INDEX = 'INDEX';
-
-	/**
-	 * A unique-key index, where all values in the index must be unique.
-	 *
-	 * @var string
-	 */
-	public const INDEX_TYPE_UNIQUE = 'UNIQUE';
-
-	/**
-	 * A full-text index for word-based searching.
-	 *
-	 * @var string
-	 */
-	public const INDEX_TYPE_FULLTEXT = 'FULLTEXT';
-
-	/**
-	 * A spatial index used for geographical data.
-	 *
-	 * @var string
-	 */
-	public const INDEX_TYPE_SPATIAL = 'SPATIAL';
 
 	/**
 	 * The base version number for a table that has not been installed yet.
@@ -165,7 +140,7 @@ abstract class Table implements Table_Interface, LoggerAwareInterface {
 	 *
 	 * @var bool|null
 	 */
-	private static ?bool $is_maria_db_installation = null;
+	private static ?bool $is_mariadb_installation = null;
 
 	/**
 	 * The version number being installed.
@@ -306,7 +281,7 @@ abstract class Table implements Table_Interface, LoggerAwareInterface {
 	 * {@inheritDoc}
 	 */
 	public function get_table_singular_name(): string {
-		return $this->table_singular_name;
+		return $this->plugin_prefix . $this->table_singular_name;
 	}
 
 	/**
@@ -395,7 +370,7 @@ abstract class Table implements Table_Interface, LoggerAwareInterface {
 	 *
 	 * @param Closure $closure The closure that builds the table.
 	 *
-	 * @phpstan-param CreateTableClosure $closure
+	 * @phpstan-param create_tableClosure $closure
 	 *
 	 * @throws Schema_Exception If the schema definition is invalid.
 	 *
@@ -636,51 +611,159 @@ abstract class Table implements Table_Interface, LoggerAwareInterface {
 	}
 
 	/**
-	 * Safely renames an existing column without altering its definition.
+	 * Renames a column and simultaneously changes its definition.
 	 *
 	 * @param string $old_column_name The current name of the column.
 	 * @param string $new_column_name The new name for the column.
+	 * @param string $new_column_definition The new SQL definition for the renamed column.
+	 * @return bool True on success, false on failure.
 	 *
-	 * @phpstan-param non-empty-string $old_column_name
-	 * @phpstan-param non-empty-string $new_column_name
-	 *
-	 * @throws Schema_Exception If any identifier is invalid.
-	 *
-	 * @phpstan-return bool
+	 * @throws Schema_Exception When old or new name is in invalid format.
 	 */
-	final protected function rename_column( string $old_column_name, string $new_column_name ): bool {
+	final protected function change_column(
+		string $old_column_name,
+		string $new_column_name,
+		string $new_column_definition
+	): bool {
+
 		if ( ! Util::valid_sql_identifier( $old_column_name ) ) {
-			throw new Schema_Exception( sprintf( 'The old column name "%s" is not a valid SQL identifier.', $old_column_name ) );
+			throw new Schema_Exception(
+				sprintf(
+					'Old column name "%s" is not a valid SQL identifier.',
+					$old_column_name
+				)
+			);
 		}
 		if ( ! Util::valid_sql_identifier( $new_column_name ) ) {
-			throw new Schema_Exception( sprintf( 'The new column name "%s" is not a valid SQL identifier.', $new_column_name ) );
-		}
-		if ( $old_column_name === $new_column_name ) {
-			return true; // No change needed.
-		}
-		if ( ! $this->column_exists( $old_column_name ) || $this->column_exists( $new_column_name ) ) {
-			return false; // Pre-conditions not met.
-		}
-
-		$table_name = $this->get_table_name();
-		// Use modern `RENAME COLUMN` syntax if available for performance and safety.
-		if ( $this->is_mysql_at_least( '8.0.3' ) || $this->is_maria_db_at_least( '10.5.3' ) ) {
-			$query = "ALTER TABLE `{$table_name}` RENAME COLUMN `{$old_column_name}` TO `{$new_column_name}`";
-		} else {
-			// Fallback to `CHANGE COLUMN` for older versions.
-			$definition = $this->get_column_definition_for_change( $old_column_name );
-			if ( '' === $definition ) {
-				return false; // Could not fetch definition.
-			}
-			$query = "ALTER TABLE `{$table_name}` CHANGE COLUMN `{$old_column_name}` `{$new_column_name}` {$definition}";
+			throw new Schema_Exception(
+				sprintf(
+					'New column name "%s" is not a valid SQL identifier.',
+					$new_column_name
+				)
+			);
 		}
 
-		$has_renamed = false !== $this->wpdb->query( $query );
-		if ( $has_renamed ) {
+		if ( ! $this->column_exists( $old_column_name ) ) {
+			return false;
+		}
+
+		if ( $old_column_name !== $new_column_name && $this->column_exists( $new_column_name ) ) {
+			return false;
+		}
+
+		$table_name  = $this->get_table_name();
+		$query       = "ALTER TABLE `$table_name` CHANGE COLUMN `$old_column_name` `$new_column_name` $new_column_definition";
+		$has_changed = false !== $this->wpdb->query( $query );
+		if ( $has_changed ) {
+			// Update the cache to reflect the new column name.
 			$this->column_cached[ $old_column_name ] = false;
 			$this->column_cached[ $new_column_name ] = true;
 		}
-		return $has_renamed;
+
+		return $has_changed;
+	}
+
+		/**
+		 * Safely renames an existing column without altering its definition.
+		 *
+		 * @param string $old_column_name The current name of the column.
+		 * @param string $new_column_name The new name for the column.
+		 *
+		 * @phpstan-param non-empty-string $old_column_name
+		 * @phpstan-param non-empty-string $new_column_name
+		 *
+		 * @return bool True on success, false on failure.
+		 *
+		 * @throws Schema_Exception When old or new name are same or they are invalid SQL identifiers.
+		 */
+	final protected function rename_column( string $old_column_name, string $new_column_name ): bool {
+
+		if ( ! Util::valid_sql_identifier( $old_column_name ) ) {
+			throw new Schema_Exception(
+				sprintf(
+					'Old column name "%s" is not a valid SQL identifier.',
+					$old_column_name
+				)
+			);
+		}
+
+		if ( ! Util::valid_sql_identifier( $new_column_name ) ) {
+			throw new Schema_Exception(
+				sprintf(
+					'New column name "%s" is not a valid SQL identifier.',
+					$new_column_name
+				)
+			);
+		}
+
+		if ( $old_column_name === $new_column_name ) {
+			throw new Schema_Exception(
+				sprintf(
+					'Old column name "%s" and new column name "%s" cannot be same.',
+					$old_column_name,
+					$new_column_name
+				)
+			);
+		}
+
+		$table_name = $this->get_table_name();
+
+		if ( ! $this->column_exists( $old_column_name ) ) {
+			$this->logger?->warning(
+				'Failed to rename column: old column does not exist.',
+				[
+					'table'           => $table_name,
+					'old_column'      => $old_column_name,
+					'new_column'      => $new_column_name,
+					'when_installing' => $this->version_being_installed,
+					'site_id'         => $this->get_current_site_id(),
+				]
+			);
+			return false;
+		}
+
+		if ( $this->column_exists( $new_column_name ) ) {
+			$this->logger?->warning(
+				'Failed to rename column: new column name already exists.',
+				[
+					'table'           => $table_name,
+					'old_column'      => $old_column_name,
+					'new_column'      => $new_column_name,
+					'when_installing' => $this->version_being_installed,
+					'site_id'         => $this->get_current_site_id(),
+				]
+			);
+			return false;
+		}
+
+		// Use modern syntax if available for performance and safety.
+		if ( $this->is_mysql_at_least( '8.0.3' ) || $this->is_mariadb_at_least( '10.5.3' ) ) {
+			$query       = "ALTER TABLE `$table_name` RENAME COLUMN `$old_column_name` TO `$new_column_name`";
+			$has_renamed = false !== $this->wpdb->query( $query );
+			if ( $has_renamed ) {
+				// Update the cache to reflect the new column name.
+				$this->column_cached[ $old_column_name ] = false;
+				$this->column_cached[ $new_column_name ] = true;
+			}
+			return $has_renamed;
+		}
+
+		// Fallback for older MySQL/MariaDB versions.
+		$definition = $this->get_column_definition_for_change( $old_column_name );
+		if ( '' === $definition ) {
+			$this->logger?->error(
+				'Failed to rename column: could not retrieve column definition for fallback.',
+				[
+					'table'           => $table_name,
+					'column'          => $old_column_name,
+					'when_installing' => $this->version_being_installed,
+					'site_id'         => $this->get_current_site_id(),
+				]
+			);
+			return false;
+		}
+
+		return $this->change_column( $old_column_name, $new_column_name, $definition );
 	}
 
 	/**
@@ -755,15 +838,51 @@ abstract class Table implements Table_Interface, LoggerAwareInterface {
 		return true;
 	}
 
+		/**
+		 * Checks if an index of a specific type exists on the table. This is the core checking method.
+		 *
+		 * @param string $index_name The name of the index to check.
+		 * @param string $index_type The type of index, other then primary.
+		 *
+		 * @phpstan-param non-empty-string $index_name
+		 * @phpstan-param Index_Types_Excluding_Primary $index_type
+		 *
+		 * @return bool True if an index of the specified name and type exists, false otherwise.
+		 */
+	final protected function index_exists_by_type(
+		string $index_name,
+		string $index_type = Index_Type::INDEX
+	): bool {
+		// 1. Ensure the cache is populated by calling index_exists first.
+		if ( ! $this->index_exists( $index_name ) ) {
+			return false;
+		}
+
+		// 2. Now, reliably get the details from the cache.
+		$index_info = $this->index_cached[ $index_name ];
+
+		if ( empty( $index_info ) ) {
+			return false; // Unlikely.
+		}
+
+		// 3. Perform the logic check on the cached data.
+		return match ( $index_type ) {
+			Index_Type::UNIQUE => '0' === $index_info['Non_unique'] && 'PRIMARY' !== $index_info['Key_name'],
+			Index_Type::FULLTEXT => 'FULLTEXT' === $index_info['Index_type'],
+			Index_Type::SPATIAL => 'SPATIAL' === $index_info['Index_type'],
+			default => '0' !== $index_info['Non_unique'] && 'BTREE' === $index_info['Index_type'],
+		};
+	}
+
 	/**
 	 * Adds an index of a specific type to the table.
 	 *
 	 * @param string|string[] $columns    Column name or an array of column names.
-	 * @param string          $index_type The type of index, using one of the `self::INDEX_TYPE_*` constants.
+	 * @param string          $index_type The type of index, using one of the `Index_Type::*` constants.
 	 * @param string|null     $index_name Name of the index (optional for autogenerated name).
 	 *
 	 * @phpstan-param non-empty-string|list<non-empty-string> $columns
-	 * @phpstan-param self::INDEX_TYPE_* $index_type
+	 * @phpstan-param Index_Type::* $index_type
 	 * @phpstan-param non-empty-string|null $index_name
 	 *
 	 * @throws Schema_Exception If any identifier is invalid.
@@ -772,7 +891,7 @@ abstract class Table implements Table_Interface, LoggerAwareInterface {
 	 */
 	final protected function add_index(
 		string|array $columns,
-		string $index_type = self::INDEX_TYPE_INDEX,
+		string $index_type = Index_Type::INDEX,
 		?string $index_name = null
 	): bool {
 		$columns_array = (array) $columns;
@@ -785,9 +904,9 @@ abstract class Table implements Table_Interface, LoggerAwareInterface {
 		$table_name = $this->get_table_name();
 		if ( null === $index_name ) {
 			$index_type_prefix = match ( $index_type ) {
-				self::INDEX_TYPE_UNIQUE => 'uq',
-				self::INDEX_TYPE_FULLTEXT => 'ft',
-				self::INDEX_TYPE_SPATIAL => 'sp',
+				Index_Type::UNIQUE => 'uq',
+				Index_Type::FULLTEXT => 'ft',
+				Index_Type::SPATIAL => 'sp',
 				default => 'idx',
 			};
 			$index_name = Util::generate_identifier_name( $this->get_table_name( false ), $columns_array, $index_type_prefix );
@@ -798,16 +917,16 @@ abstract class Table implements Table_Interface, LoggerAwareInterface {
 		}
 
 		$column_list   = '`' . implode( '`, `', $columns_array ) . '`';
-		$type_keyword  = self::INDEX_TYPE_INDEX === $index_type ? '' : $index_type;
+		$type_keyword  = Index_Type::INDEX === $index_type ? '' : $index_type;
 		$sql_statement = "ALTER TABLE `{$table_name}` ADD {$type_keyword} INDEX `{$index_name}` ({$column_list})";
 
 		$has_added = false !== $this->wpdb->query( $sql_statement );
 		if ( $has_added ) {
 			/** @phpstan-var IndexCacheRow $index_info */
 			$index_info                        = [
-				'Non_unique' => self::INDEX_TYPE_UNIQUE === $index_type ? '0' : '1',
+				'Non_unique' => Index_Type::UNIQUE === $index_type ? '0' : '1',
 				'Key_name'   => $index_name,
-				'Index_type' => in_array( $index_type, [ self::INDEX_TYPE_INDEX, self::INDEX_TYPE_UNIQUE ], true ) ? 'BTREE' : $index_type,
+				'Index_type' => in_array( $index_type, [ Index_Type::INDEX, Index_Type::UNIQUE ], true ) ? 'BTREE' : $index_type,
 			];
 			$this->index_cached[ $index_name ] = $index_info;
 		}
@@ -898,6 +1017,34 @@ abstract class Table implements Table_Interface, LoggerAwareInterface {
 			$this->index_cached['PRIMARY'] = false;
 		}
 		return $has_dropped;
+	}
+
+	/**
+	 * A convenience wrapper to check if a UNIQUE index exists.
+	 *
+	 * @param string $index_name The name of the unique index.
+	 *
+	 * @phpstan-param non-empty-string $index_name
+	 *
+	 * @return bool True if the unique index exists, false otherwise.
+	 */
+	final protected function unique_key_exists( string $index_name ): bool {
+		return $this->index_exists_by_type( $index_name, Index_Type::UNIQUE );
+	}
+
+	/**
+	 * A convenience wrapper to add a UNIQUE index.
+	 *
+	 * @param string|string[] $columns Column name or an array of column names.
+	 * @param string|null     $index_name Name of the unique index (optional for autogenerated name).
+	 *
+	 * @phpstan-param non-empty-string|list<non-empty-string> $columns
+	 * @phpstan-param non-empty-string|null $index_name
+	 *
+	 * @return bool True on success or if the index already existed, false on failure.
+	 */
+	final protected function add_unique_key( string|array $columns, ?string $index_name = null ): bool {
+		return $this->add_index( $columns, Index_Type::UNIQUE, $index_name );
 	}
 
 	/*
@@ -1072,12 +1219,12 @@ abstract class Table implements Table_Interface, LoggerAwareInterface {
 	 *
 	 * @phpstan-return bool
 	 */
-	final protected function is_maria_db(): bool {
-		if ( ! isset( self::$is_maria_db_installation ) ) {
-				$info_string                = strtolower( (string) $this->wpdb->get_var( 'SELECT @@version_comment' ) );
-			self::$is_maria_db_installation = str_contains( $info_string, 'mariadb' );
+	final protected function is_mariadb(): bool {
+		if ( ! isset( self::$is_mariadb_installation ) ) {
+			$info_string                   = strtolower( (string) $this->wpdb->get_var( 'SELECT @@version_comment' ) );
+			self::$is_mariadb_installation = str_contains( $info_string, 'mariadb' );
 		}
-		return self::$is_maria_db_installation;
+		return self::$is_mariadb_installation;
 	}
 
 	/**
@@ -1086,7 +1233,7 @@ abstract class Table implements Table_Interface, LoggerAwareInterface {
 	 * @return string
 	 * @phpstan-return non-empty-string
 	 */
-	final protected function get_mysql_or_maria_db_version(): string {
+	final protected function get_mysql_or_mariadb_version(): string {
 		if ( ! isset( self::$mysql_server_version ) ) {
 			$version_string = (string) $this->wpdb->get_var( 'SELECT @@version' );
 			$version_string = (string) preg_replace( '/[^0-9.].*/', '', $version_string );
@@ -1106,7 +1253,7 @@ abstract class Table implements Table_Interface, LoggerAwareInterface {
 	 * @phpstan-return bool
 	 */
 	final protected function is_mysql_at_least( string $version ): bool {
-		return ! $this->is_maria_db() && version_compare( $this->get_mysql_or_maria_db_version(), $version, '>=' );
+		return ! $this->is_mariadb() && version_compare( $this->get_mysql_or_mariadb_version(), $version, '>=' );
 	}
 
 	/**
@@ -1118,7 +1265,7 @@ abstract class Table implements Table_Interface, LoggerAwareInterface {
 	 *
 	 * @phpstan-return bool
 	 */
-	final protected function is_maria_db_at_least( string $version ): bool {
-		return $this->is_maria_db() && version_compare( $this->get_mysql_or_maria_db_version(), $version, '>=' );
+	final protected function is_mariadb_at_least( string $version ): bool {
+		return $this->is_mariadb() && version_compare( $this->get_mysql_or_mariadb_version(), $version, '>=' );
 	}
 }

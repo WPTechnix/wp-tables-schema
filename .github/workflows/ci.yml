@@ -206,10 +206,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - db-image: mysql:5.6
+            db-name: MySQL 5.6
           - db-image: mysql:5.7
             db-name: MySQL 5.7
           - db-image: mysql:8.0
             db-name: MySQL 8.0
+          - db-image: mariadb:10.1
+            db-name: MariaDB 10.1
           - db-image: mariadb:10.2
             db-name: MariaDB 10.2
           - db-image: mariadb:10.11
