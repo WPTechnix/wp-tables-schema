@@ -10,7 +10,7 @@
     "wpdb",
     "migrations"
   ],
-  "version": "0.1.0",
+  "version": "1.0.0",
   "author": "WPTechnix <developers@wptechnix.com>",
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",

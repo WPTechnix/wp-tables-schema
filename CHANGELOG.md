@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.0 (2025-08-23)
+
+* chore: initalize the project ([7a218d4](https://github.com/WPTechnix/wp-tables-schema/commit/7a218d4))
+* chore: update composer.json description ([a5a4622](https://github.com/WPTechnix/wp-tables-schema/commit/a5a4622))
+* chore(docs): trigger wiki sync ([a1a866e](https://github.com/WPTechnix/wp-tables-schema/commit/a1a866e))
+* docs: add comprehensive developer documentation (#3) ([861db40](https://github.com/WPTechnix/wp-tables-schema/commit/861db40)), closes [#3](https://github.com/WPTechnix/wp-tables-schema/issues/3)
+* feat: Add Builder for `CREATE TABLE` Statements (#1) ([b9025fc](https://github.com/WPTechnix/wp-tables-schema/commit/b9025fc)), closes [#1](https://github.com/WPTechnix/wp-tables-schema/issues/1)
+* feat: Introduce abstract Table class for schema management and migrations ([1ad73d8](https://github.com/WPTechnix/wp-tables-schema/commit/1ad73d8))
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
