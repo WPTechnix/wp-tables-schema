@@ -8,6 +8,7 @@ on:
       - '**.md'
       - 'docker/**'
       - '.husky/**'
+      - 'docs/**'
       - '.editorconfig'
       - '.gitattributes'
       - '.release-it.json'
@@ -16,6 +17,7 @@ on:
       - 'bin/composer'
       - 'package.json'
       - 'package-lock.json'
+      - '.github/workflows/sync-docs-to-wiki.yml'
       - '.github/workflows/commitlint.yml'
       - '.github/workflows/release.yml'
 

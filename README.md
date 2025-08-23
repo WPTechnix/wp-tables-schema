@@ -87,13 +87,15 @@ class Events_Table extends Table
             }
         );
     }
-}```
+}
+```
 
 ### Step 2: Run the Installation
 
 In your main plugin file, hook a function to `register_activation_hook` to run the installer.
 
 **`my-plugin.php`**
+
 ```php
 <?php
 

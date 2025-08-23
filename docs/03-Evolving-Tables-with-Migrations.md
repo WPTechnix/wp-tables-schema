@@ -132,7 +132,8 @@ protected function migrate_to_10007(): bool
     // The library would have named the index on the `status` column `idx_tasks_status`.
     $this->drop_index('idx_tasks_status');
     return true;
-}```
+}
+```
 
 ---
 

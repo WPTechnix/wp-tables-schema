@@ -134,7 +134,7 @@ function my_plugin_install() {
     //    We'll only log messages that are WARNING level or higher.
     $log_file = __DIR__ . '/migrations.log';
     $log->pushHandler(new StreamHandler($log_file, Level::Warning));
-    // ------------------
+    // --------------------
     
     // Instantiate your table.
     $tasks_table = new Tasks_Table($wpdb);

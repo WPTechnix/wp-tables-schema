@@ -50,7 +50,8 @@ class Tasks_Meta_Table extends Meta_Table
      * @var string
      */
     protected string $plugin_prefix = 'my_plugin_';
-}```
+}
+```
 
 #### 2. Update the Installer
 Next, go to your main installer function. The `Meta_Table` constructor requires the **parent table object** as its first argument.
