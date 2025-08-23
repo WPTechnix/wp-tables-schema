@@ -1,7 +1,7 @@
 {
     "name": "wptechnix/wp-tables-schema",
     "version": "0.1.0",
-    "description": "A modern, fluent schema builder for creating, migrating, and managing custom WordPress database tables with a powerful, object-oriented API.",
+    "description": "A developer-friendly library for creating and managing custom WordPress database tables with schema definition, versioning, and migrations.",
     "type": "library",
     "license": "MIT",
     "keywords": [

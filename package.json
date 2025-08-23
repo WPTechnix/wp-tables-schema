@@ -1,6 +1,6 @@
 {
   "name": "wp-tables-schema",
-  "description": "A modern, fluent schema builder for creating, migrating, and managing custom WordPress database tables with a powerful, object-oriented API.",
+  "description": "A developer-friendly library for creating and managing custom WordPress database tables with schema definition, versioning, and migrations.",
   "license": "MIT",
   "keywords": [
     "wordpress",
