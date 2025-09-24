@@ -35,13 +35,6 @@ class Test_Index_Operations_Table extends Table {
 	protected string $table_singular_name = 'indexes';
 
 	/**
-	 * The table alias.
-	 *
-	 * @var string
-	 */
-	protected string $table_alias = 'idx';
-
-	/**
 	 * The primary key column.
 	 *
 	 * @var string

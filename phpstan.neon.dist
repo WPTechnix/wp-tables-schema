@@ -3,7 +3,7 @@ parameters:
         min: 80000
         max: 80410
 
-    level: 8
+    level: 9
     tmpDir: /tmp/.phpstan
     paths:
         - src/
@@ -17,9 +17,6 @@ parameters:
     # Strict rules configuration
     strictRules:
         noVariableVariables: false
-
-    ignoreErrors:
-        - identifier: empty.notAllowed
 
     treatPhpDocTypesAsCertain: false
 

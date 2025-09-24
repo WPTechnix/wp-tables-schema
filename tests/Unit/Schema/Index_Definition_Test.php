@@ -6,7 +6,6 @@
 namespace WPTechnix\WP_Tables_Schema\Tests\Unit\Schema;
 
 use PHPUnit\Framework\TestCase;
-use WPTechnix\WP_Tables_Schema\Constants\Index_Algorithm;
 use WPTechnix\WP_Tables_Schema\Constants\Index_Type;
 use WPTechnix\WP_Tables_Schema\Exceptions\Schema_Exception;
 use WPTechnix\WP_Tables_Schema\Schema\Index_Definition;
@@ -112,30 +111,6 @@ final class Index_Definition_Test extends TestCase {
 	}
 
 	/**
-	 * Tests that the 'using' method succeeds with a valid algorithm.
-	 *
-	 * @test
-	 */
-	public function test_using_succeeds_with_valid_algorithm(): void {
-		$index = new Index_Definition( 'idx_test', [ 'column1' ] );
-		$index->using( Index_Algorithm::BTREE );
-
-		self::assertStringContainsString( 'USING BTREE', $index->to_sql() );
-	}
-
-	/**
-	 * Tests that the 'using' method throws an exception for an invalid algorithm.
-	 *
-	 * @test
-	 */
-	public function test_using_throws_on_invalid_algorithm(): void {
-		$this->expectException( Schema_Exception::class );
-		$this->expectExceptionMessage( 'The specified index algorithm "INVALID_ALGO" on index "idx_test" is not valid. Please use one of: "BTREE", "HASH".' );
-		$index = new Index_Definition( 'idx_test', [ 'column1' ] );
-		$index->using( 'INVALID_ALGO' );
-	}
-
-	/**
 	 * Tests that the 'length' method succeeds with valid inputs.
 	 *
 	 * @test
@@ -196,9 +171,9 @@ final class Index_Definition_Test extends TestCase {
 	 */
 	public function test_to_sql_for_complex_index(): void {
 		$index = new Index_Definition( 'idx_complex', [ 'col_a', 'col_b' ], Index_Type::UNIQUE );
-		$index->length( 'col_a', 20 )->using( Index_Algorithm::BTREE );
+		$index->length( 'col_a', 20 );
 
-		$expected_sql = 'UNIQUE KEY `idx_complex` (`col_a`(20), `col_b`) USING BTREE';
+		$expected_sql = 'UNIQUE KEY `idx_complex` (`col_a`(20), `col_b`)';
 		self::assertSame( $expected_sql, $index->to_sql() );
 	}
 

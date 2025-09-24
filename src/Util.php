@@ -1,6 +1,9 @@
 <?php
 /**
- * Utility functions.
+ * Utility Functions.
+ *
+ * This class provides a collection of static utility functions
+ * that can be used throughout the package.
  *
  * @package WPTechnix\WP_Tables_Schema
  */
@@ -10,23 +13,19 @@ declare(strict_types=1);
 namespace WPTechnix\WP_Tables_Schema;
 
 /**
- * A collection of utility functions.
+ * Class Util.
+ *
+ * A final class containing reusable utility methods for common tasks.
+ * All methods are intended to be static.
  */
 final class Util {
 
 	/**
 	 * Maximum allowed length for MySQL identifiers.
 	 *
-	 * @var int
-	 * @phpstan-var positive-int
+	 * @var positive-int
 	 */
 	public const MAX_IDENTIFIER_LENGTH = 64;
-
-	/**
-	 * Private constructor to prevent instantiation.
-	 */
-	private function __construct() {
-	}
 
 	/**
 	 * Validates a string as a valid SQL identifier.
@@ -34,17 +33,15 @@ final class Util {
 	 * @param mixed $identifier The identifier to validate.
 	 *
 	 * @return bool True if valid, false otherwise.
-	 *
-	 * @phpstan-assert-if-true non-empty-string $identifier
 	 */
 	public static function valid_sql_identifier( mixed $identifier ): bool {
-		// Must not be empty.
+		// Must be a non-empty string.
 		if ( ! is_string( $identifier ) || '' === trim( $identifier ) ) {
 			return false;
 		}
 
 		// Must not exceed maximum length.
-		if ( strlen( $identifier ) > self::MAX_IDENTIFIER_LENGTH ) {
+		if ( self::MAX_IDENTIFIER_LENGTH < strlen( $identifier ) ) {
 			return false;
 		}
 
@@ -67,14 +64,13 @@ final class Util {
 	 * @param string $str The raw string to format.
 	 *
 	 * @return string The escaped string.
-	 * @phpstan-return ( $str is non-empty-string ? non-empty-string : string )
 	 */
 	public static function escape_sql( string $str ): string {
 		// Check if WordPress function exists.
 		if ( function_exists( 'esc_sql' ) ) {
-			$returned = esc_sql( $str );
-			/** @phpstan-var non-empty-string $returned */
-			return $returned;
+			/** @var string $escaped */
+			$escaped = esc_sql( $str );
+			return $escaped;
 		}
 
 		// @codeCoverageIgnore
@@ -92,17 +88,11 @@ final class Util {
 	 * If the name exceeds 64 characters, it is truncated and a hash is appended
 	 * to ensure uniqueness.
 	 *
-	 * @param string $table_name The base table name (without prefix).
-	 * @param array  $columns    The columns used in the constraint.
-	 * @param string $prefix     The prefix to use (e.g., "idx", "fk").
-	 *
-	 * @phpstan-param non-empty-string $table_name
-	 * @phpstan-param list<non-empty-string> $columns
-	 * @phpstan-param non-empty-string $prefix
-	 *
-	 * @return string The generated constraint name.
-	 *
-	 * @phpstan-return non-empty-string
+	 * @param non-empty-string       $table_name The base table name (without prefix).
+	 * @param list<non-empty-string> $columns    The columns used in the constraint.
+	 * @param non-empty-string       $prefix     The prefix to use (e.g., "idx", "fk").
+
+	 * @return non-empty-string The generated constraint name.
 	 */
 	public static function generate_identifier_name( string $table_name, array $columns, string $prefix ): string {
 
@@ -111,7 +101,7 @@ final class Util {
 		$ideal_name  = "{$prefix}_{$table_name}_{$column_part}";
 
 		// If it fits, use it.
-		if ( strlen( $ideal_name ) <= self::MAX_IDENTIFIER_LENGTH ) {
+		if ( self::MAX_IDENTIFIER_LENGTH >= strlen( $ideal_name ) ) {
 			return $ideal_name;
 		}
 
@@ -124,7 +114,7 @@ final class Util {
 		// Prefer to truncate the column part first.
 		$prefix_and_table = "{$prefix}_{$table_name}";
 
-		if ( strlen( $prefix_and_table ) > $max_base_length ) {
+		if ( $max_base_length < strlen( $prefix_and_table ) ) {
 			// Even prefix and table are too long, truncate everything.
 			return substr( $ideal_name, 0, $max_base_length ) . '_' . $hash;
 		}

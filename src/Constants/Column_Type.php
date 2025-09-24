@@ -10,23 +10,31 @@ declare(strict_types=1);
 namespace WPTechnix\WP_Tables_Schema\Constants;
 
 /**
- * Column Type Constants
+ * Column Type Constants.
  *
  * @phpstan-type Column_Type_Integer self::TINYINT | self::SMALLINT | self::MEDIUMINT | self::INT | self::INTEGER | self::BIGINT
  * @phpstan-type Column_Type_Double self::DECIMAL | self::NUMERIC | self::FLOAT | self::DOUBLE
  * @phpstan-type Column_Type_Numeric Column_Type_Integer | Column_Type_Double
- *
  * @phpstan-type Column_Type_Text self::TINYTEXT | self::TEXT | self::MEDIUMTEXT | self::LONGTEXT
  * @phpstan-type Column_Type_Basic_String self::CHAR | self::VARCHAR
  * @phpstan-type Column_Type_String Column_Type_Basic_String | Column_Type_Text
- *
  * @phpstan-type Column_Type_Date self::DATE | self::TIME | self::DATETIME | self::TIMESTAMP | self::YEAR
- *
  * @phpstan-type Column_Type_Blob self::TINYBLOB | self::BLOB | self::MEDIUMBLOB | self::LONGBLOB
  * @phpstan-type Column_Type_Binary_String self::BINARY | self::VARBINARY
  * @phpstan-type Column_Type_Binary Column_Type_Binary_String | Column_Type_Blob
- *
  * @phpstan-type Column_Type_Spatial self::GEOMETRY | self::POINT | self::LINESTRING | self::POLYGON | self::MULTIPOINT | self::MULTILINESTRING | self::MULTIPOLYGON | self::GEOMETRYCOLLECTION
+ *
+ * @psalm-type Column_Type_Integer self::TINYINT | self::SMALLINT | self::MEDIUMINT | self::INT | self::INTEGER | self::BIGINT
+ * @psalm-type Column_Type_Double self::DECIMAL | self::NUMERIC | self::FLOAT | self::DOUBLE
+ * @psalm-type Column_Type_Numeric Column_Type_Integer | Column_Type_Double
+ * @psalm-type Column_Type_Text self::TINYTEXT | self::TEXT | self::MEDIUMTEXT | self::LONGTEXT
+ * @psalm-type Column_Type_Basic_String self::CHAR | self::VARCHAR
+ * @psalm-type Column_Type_String Column_Type_Basic_String | Column_Type_Text
+ * @psalm-type Column_Type_Date self::DATE | self::TIME | self::DATETIME | self::TIMESTAMP | self::YEAR
+ * @psalm-type Column_Type_Blob self::TINYBLOB | self::BLOB | self::MEDIUMBLOB | self::LONGBLOB
+ * @psalm-type Column_Type_Binary_String self::BINARY | self::VARBINARY
+ * @psalm-type Column_Type_Binary Column_Type_Binary_String | Column_Type_Blob
+ * @psalm-type Column_Type_Spatial self::GEOMETRY | self::POINT | self::LINESTRING | self::POLYGON | self::MULTIPOINT | self::MULTILINESTRING | self::MULTIPOLYGON | self::GEOMETRYCOLLECTION
  */
 final class Column_Type {
 
@@ -71,17 +79,9 @@ final class Column_Type {
 	public const JSON               = 'JSON';
 
 	/**
-	 * Private constructor to prevent instantiation.
-	 */
-	private function __construct() {
-	}
-
-	/**
 	 * Get all defined column types.
 	 *
-	 * @return string[] An array of all column type constants.
-	 *
-	 * @phpstan-return list<self::*>
+	 * @return list<self::*> An array of all column type constants.
 	 */
 	public static function get_all(): array {
 		return [
@@ -100,8 +100,7 @@ final class Column_Type {
 	/**
 	 * Get all integer column types.
 	 *
-	 * @return string[] An array of integer type constants.
-	 * @phpstan-return list<Column_Type_Integer>
+	 * @return list<Column_Type_Integer> An array of integer type constants.
 	 */
 	public static function get_integer_types(): array {
 		return [
@@ -117,8 +116,7 @@ final class Column_Type {
 	/**
 	 * Get all double/floating-point column types.
 	 *
-	 * @return string[] An array of double type constants.
-	 * @phpstan-return list<Column_Type_Double>
+	 * @return list<Column_Type_Double> An array of double type constants.
 	 */
 	public static function get_double_types(): array {
 		return [
@@ -132,8 +130,7 @@ final class Column_Type {
 	/**
 	 * Get all numeric column types.
 	 *
-	 * @return string[] An array of numeric type constants.
-	 * @phpstan-return list<Column_Type_Numeric>
+	 * @return list<Column_Type_Numeric> An array of numeric type constants.
 	 */
 	public static function get_numeric_types(): array {
 		return [ ...self::get_integer_types(), ...self::get_double_types() ];
@@ -142,8 +139,7 @@ final class Column_Type {
 	/**
 	 * Get text-based column types (excluding CHAR and VARCHAR).
 	 *
-	 * @return string[] An array of text type constants.
-	 * @phpstan-return list<Column_Type_Text>
+	 * @return list<Column_Type_Text> An array of text type constants.
 	 */
 	public static function get_text_types(): array {
 		return [
@@ -161,6 +157,7 @@ final class Column_Type {
 	 *
 	 * @return string[] An array of string type constants.
 	 * @phpstan-return ($include_text_types is true ? list<Column_Type_String> : list<Column_Type_Basic_String>)
+	 * @psalm-return ($include_text_types is true ? list<Column_Type_String> : list<Column_Type_Basic_String>)
 	 */
 	public static function get_string_types( bool $include_text_types = true ): array {
 		return [
@@ -173,8 +170,7 @@ final class Column_Type {
 	/**
 	 * Get all date and time related column types.
 	 *
-	 * @return string[] An array of date and time type constants.
-	 * @phpstan-return list<Column_Type_Date>
+	 * @return list<Column_Type_Date> An array of date and time type constants.
 	 */
 	public static function get_date_types(): array {
 		return [
@@ -189,8 +185,7 @@ final class Column_Type {
 	/**
 	 * Get all BLOB (Binary Large Object) column types.
 	 *
-	 * @return string[] An array of BLOB type constants.
-	 * @phpstan-return list<Column_Type_Blob>
+	 * @return list<Column_Type_Blob> An array of BLOB type constants.
 	 */
 	public static function get_blob_types(): array {
 		return [
@@ -205,8 +200,10 @@ final class Column_Type {
 	 * Get all binary string column types.
 	 *
 	 * @param bool $include_blobs Whether to include BLOB types. Default true.
+	 *
 	 * @return string[] An array of binary type constants.
 	 * @phpstan-return ($include_blobs is true ? list<Column_Type_Binary> : list<Column_Type_Binary_String>)
+	 * @psalm-return ($include_blobs is true ? list<Column_Type_Binary> : list<Column_Type_Binary_String>)
 	 */
 	public static function get_binary_types( bool $include_blobs = true ): array {
 		return [
@@ -219,8 +216,7 @@ final class Column_Type {
 	/**
 	 * Get all spatial (GIS) column types.
 	 *
-	 * @return string[] An array of spatial type constants.
-	 * @phpstan-return list<Column_Type_Spatial>
+	 * @return list<Column_Type_Spatial> An array of spatial type constants.
 	 */
 	public static function get_spatial_types(): array {
 		return [

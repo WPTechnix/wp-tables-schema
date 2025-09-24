@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version: [8.0, 8.4]
+        php-version: [8.1, 8.4]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -95,7 +95,7 @@ jobs:
 
       # Only annotate from one PHP version to avoid duplicate comments
       - name: Create annotations from PHPCS report (Pull Request)
-        if: github.event_name == 'pull_request' && matrix.php-version == '8.0'
+        if: github.event_name == 'pull_request' && matrix.php-version == '8.1'
         uses: staabm/annotate-pull-request-from-checkstyle-action@v1
         with:
           files: phpcs-report-${{ matrix.php-version }}.xml
@@ -106,8 +106,40 @@ jobs:
         if: github.event_name != 'pull_request'
         run: ./vendor/bin/phpcs --no-cache
 
+  # Psalm - Run on highest PHP version for maximum coverage
+  psalm:
+    name: Static Analysis (Psalm)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          tools: composer
+          coverage: none
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-php8.4-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-php8.4-composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Run Psalm
+        run: ./vendor/bin/psalm --output-format=github --config=psalm.xml.dist --show-info=true --no-cache
+
   # PHPStan - Run on highest PHP version for maximum coverage
-  static-analysis:
+  phpstan:
     name: Static Analysis (PHPStan)
     runs-on: ubuntu-latest
     steps:
@@ -138,7 +170,6 @@ jobs:
       - name: Run PHPStan
         run: ./vendor/bin/phpstan analyse --no-progress --error-format=github
 
-
   # Test against multiple PHP versions with their respective dependencies
   phpunit-php-versions:
     name: PHPUnit (PHP ${{ matrix.php-version }}, WP ${{ matrix.wordpress-version }})
@@ -146,11 +177,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: [8.0, 8.1, 8.2, 8.3, 8.4]
+        php-version: [8.1, 8.2, 8.3, 8.4]
         wordpress-version: ['latest']
         include:
           # Test minimum PHP with minimum supported WordPress
-          - php-version: 8.0
+          - php-version: 8.1
             wordpress-version: '6.0'
           # Test maximum PHP with latest WordPress
           - php-version: 8.4

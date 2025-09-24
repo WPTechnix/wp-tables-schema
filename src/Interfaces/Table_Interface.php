@@ -1,6 +1,6 @@
 <?php
 /**
- * Interface Table_Interface
+ * Interface Table_Interface.
  *
  * @package WPTechnix\WP_Tables_Schema\Interfaces
  */
@@ -10,25 +10,21 @@ declare(strict_types=1);
 namespace WPTechnix\WP_Tables_Schema\Interfaces;
 
 /**
- * Interface Table_Interface
+ * Interface Table_Interface.
  */
 interface Table_Interface {
 
 	/**
 	 * Gets the current schema version of the table.
 	 *
-	 * @return int Schema version number.
-	 *
-	 * @phpstan-return positive-int
+	 * @return positive-int Schema version number.
 	 */
 	public function get_schema_version(): int;
 
 	/**
 	 * Gets the currently installed version of the table.
 	 *
-	 * @return int Installed version number.
-	 *
-	 * @phpstan-return positive-int
+	 * @return positive-int Installed version number.
 	 */
 	public function get_installed_version(): int;
 
@@ -40,45 +36,28 @@ interface Table_Interface {
 	 *
 	 * @param bool $with_wp_prefix Whether to include the global WordPress prefix (e.g., 'wp_').
 	 *
-	 * @return string The sanitized, fully prefixed table name.
-	 *
-	 * @phpstan-return non-empty-string
+	 * @return non-empty-string The sanitized, fully prefixed table name.
 	 */
 	public function get_table_name( bool $with_wp_prefix = true ): string;
 
 	/**
 	 * Gets the singular name, without WordPress or plugin prefixes.
 	 *
-	 * @return string
-	 *
-	 * @phpstan-return non-empty-string
+	 * @return non-empty-string
 	 */
 	public function get_table_singular_name(): string;
 
 	/**
-	 * Gets the table alias used in queries.
-	 *
-	 * @return string Table alias.
-	 *
-	 * @phpstan-return non-empty-string
-	 */
-	public function get_table_alias(): string;
-
-	/**
 	 * Gets the primary key column name for the table.
 	 *
-	 * @return string Primary key column name.
-	 *
-	 * @phpstan-return non-empty-string
+	 * @return non-empty-string Primary key column name.
 	 */
 	public function get_primary_key(): string;
 
 	/**
 	 * Gets the foreign key name for the table.
 	 *
-	 * @return string Foreign key name.
-	 *
-	 * @phpstan-return non-empty-string
+	 * @return non-empty-string Foreign key name.
 	 */
 	public function get_foreign_key_name(): string;
 

@@ -37,83 +37,75 @@ use WPTechnix\WP_Tables_Schema\Util;
  * }
  * ```
  *
- * @see \WPTechnix\WP_Tables_Schema\Schema\Column_Definition
- * @see \WPTechnix\WP_Tables_Schema\Schema\Index_Definition
- * @see \WPTechnix\WP_Tables_Schema\Schema\Foreign_Key_Definition
+ * @see Column_Definition
+ * @see Index_Definition
+ * @see Foreign_Key_Definition
  *
- * @phpstan-type Supported_Index_Type = Index_Type::INDEX|Index_Type::UNIQUE|Index_Type::FULLTEXT|Index_Type::SPATIAL
+ * @phpstan-import-type Index_Types_Excluding_Primary from Index_Type
+ * @psalm-import-type Index_Types_Excluding_Primary from Index_Type
  */
 final class Create_Table_Schema {
 
 	/**
-	 * The full table name
+	 * The full table name.
 	 *
-	 * @var string
-	 * @phpstan-var non-empty-string
+	 * @var non-empty-string
 	 */
 	private string $table_name;
 
 	/**
-	 * The short table name (Ideal for genearting fk/index names).
+	 * The short table name (Ideal for generating fk/index names).
 	 *
-	 * @var string
-	 * @phpstan-var non-empty-string
+	 * @var non-empty-string
 	 */
 	private string $short_table_name;
 
 	/**
 	 * Column definitions, keyed by column name for efficient lookups.
 	 *
-	 * @var array
-	 * @phpstan-var array<non-empty-string, Column_Definition>
+	 * @var array<non-empty-string, Column_Definition>
 	 */
 	private array $columns = [];
 
 	/**
 	 * Index definitions, keyed by index name for efficient lookups.
 	 *
-	 * @var array
-	 * @phpstan-var array<non-empty-string, Index_Definition>
+	 * @var array<non-empty-string, Index_Definition>
 	 */
 	private array $indexes = [];
 
 	/**
 	 * Foreign key definitions, keyed by constraint name for efficient lookups.
 	 *
-	 * @var array
-	 * @phpstan-var array<non-empty-string, Foreign_Key_Definition>
+	 * @var array<non-empty-string, Foreign_Key_Definition>
 	 */
 	private array $foreign_keys = [];
 
 	/**
 	 * Storage engine.
 	 *
-	 * @var string
-	 * @phpstan-var non-empty-string
+	 * @var non-empty-string
 	 */
 	private string $engine = 'InnoDB';
 
 	/**
 	 * Default character set.
 	 *
-	 * @var string
-	 * @phpstan-var non-empty-string
+	 * @var non-empty-string
 	 */
 	private string $charset = 'utf8mb4';
 
 	/**
 	 * Default collation.
 	 *
-	 * @var string
-	 * @phpstan-var non-empty-string
+	 * @var non-empty-string
 	 */
 	private string $collation = 'utf8mb4_unicode_ci';
 
 	/**
 	 * Table comment.
 	 *
-	 * @var string|null
-	 * @phpstan-var non-empty-string|null
+	 * @var non-empty-string|null
 	 */
 	private ?string $comment = null;
 
@@ -127,21 +119,17 @@ final class Create_Table_Schema {
 	/**
 	 * AUTO_INCREMENT starting value.
 	 *
-	 * @var int|null
-	 * @phpstan-var positive-int|null
+	 * @var positive-int|null
 	 */
 	private ?int $auto_increment_start = null;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param string      $table_name       Full table name.
-	 * @param string|null $short_table_name A shorter version for table name. Ideal for generating
-	 *                                      names for indexes and foreign keys. (Optional). If not
-	 *                                      specified, $table_name will be used.
-	 *
-	 * @phpstan-param non-empty-string $table_name
-	 * @phpstan-param non-empty-string|null $short_table_name
+	 * @param non-empty-string      $table_name       Full table name.
+	 * @param non-empty-string|null $short_table_name A shorter version for table name. Ideal for generating
+	 *                                                names for indexes and foreign keys. (Optional). If not
+	 *                                                specified, $table_name will be used.
 	 *
 	 * @throws Schema_Exception When the table name is invalid.
 	 */
@@ -188,7 +176,6 @@ final class Create_Table_Schema {
 	 *
 	 * @param Column_Definition $column The column definition.
 	 * @return Column_Definition
-	 * @throws Schema_Exception If the schema has already been compiled.
 	 */
 	private function add_column( Column_Definition $column ): Column_Definition {
 		$this->columns[ $column->get_name() ] = $column;
@@ -198,13 +185,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a BIGINT column.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function big_integer( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::BIGINT ) );
@@ -213,13 +198,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add an INT column.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function integer( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::INTEGER ) );
@@ -228,13 +211,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a MEDIUMINT column.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function medium_integer( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::MEDIUMINT ) );
@@ -243,13 +224,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a SMALLINT column.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function small_integer( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::SMALLINT ) );
@@ -258,13 +237,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a TINYINT column.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function tiny_integer( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::TINYINT ) );
@@ -273,13 +250,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a BOOLEAN column (alias for TINYINT).
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function boolean( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::TINYINT, [ 1 ] ) );
@@ -288,33 +263,18 @@ final class Create_Table_Schema {
 	/**
 	 * Add a DECIMAL column for precise numeric values.
 	 *
-	 * @param string $column_name The column name.
-	 * @param int    $precision   Total number of digits (1-65).
-	 * @param int    $scale       Digits after decimal point (0-30).
-	 *
-	 * @phpstan-param non-empty-string $column_name
-	 * @phpstan-param int<1, 65> $precision
-	 * @phpstan-param int<0, 30> $scale
+	 * @param non-empty-string $column_name The column name.
+	 * @param int<1,65>        $precision   Total number of digits (1-65).
+	 * @param int<0,30>        $scale       Digits after decimal point (0-30).
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function decimal( string $column_name, int $precision = 10, int $scale = 0 ): Column_Definition {
-		if ( $precision < 1 || $precision > 65 ) {
-			throw new Schema_Exception(
-				sprintf( 'DECIMAL precision for column "%s" must be between 1 and 65.', $column_name )
-			);
-		}
 
-		if ( $scale < 0 || $scale > 30 || $scale > $precision ) {
-			throw new Schema_Exception(
-				sprintf(
-					'DECIMAL scale for column "%s" must be between 0 and 30, and not greater than precision.',
-					$column_name
-				)
-			);
-		}
+		$precision = max( 1, min( 65, $precision ) );
+		$scale     = max( 0, min( 30, $scale ) );
 
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::DECIMAL, [ $precision, $scale ] ) );
 	}
@@ -322,13 +282,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a DECIMAL(19,4) column, suitable for storing monetary values.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function money( string $column_name ): Column_Definition {
 		return $this->decimal( $column_name, 19, 4 );
@@ -337,13 +295,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a FLOAT column.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function float( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::FLOAT ) );
@@ -352,13 +308,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a DOUBLE column.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function double( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::DOUBLE ) );
@@ -367,65 +321,45 @@ final class Create_Table_Schema {
 	/**
 	 * Add a VARCHAR column.
 	 *
-	 * @param string $column_name The column name.
-	 * @param int    $length      Maximum length (1-65535).
-	 *
-	 * @phpstan-param non-empty-string $column_name
-	 * @phpstan-param int<1, 65535> $length
+	 * @param non-empty-string $column_name The column name.
+	 * @param int<1,65535>     $length      Maximum length (1-65535).
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function string( string $column_name, int $length = 191 ): Column_Definition {
-		if ( $length < 1 || $length > 65535 ) {
-			throw new Schema_Exception(
-				sprintf(
-					'VARCHAR length must be between 1 and 65535, got %d for column "%s".',
-					$length,
-					$column_name
-				)
-			);
-		}
-
+		$length = max( 1, min( 65535, $length ) );
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::VARCHAR, [ $length ] ) );
 	}
 
 	/**
 	 * Add a CHAR fixed-length column.
 	 *
-	 * @param string $column_name The column name.
-	 * @param int    $length      Fixed length (1-255).
-	 *
-	 * @phpstan-param non-empty-string $column_name
-	 * @phpstan-param int<1, 255> $length
+	 * @param non-empty-string $column_name The column name.
+	 * @param int<1,255>       $length      Fixed length (1-255).
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function char( string $column_name, int $length = 1 ): Column_Definition {
-		if ( $length < 1 || $length > 255 ) {
-			throw new Schema_Exception(
-				sprintf( 'CHAR length must be between 1 and 255, got %d for column "%s".', $length, $column_name )
-			);
-		}
-
+		$length = max( 1, min( 255, $length ) );
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::CHAR, [ $length ] ) );
 	}
 
 	/**
 	 * Add a BINARY column (fixed-length binary string).
 	 *
-	 * @param string $column_name The column name.
-	 * @param int    $length      The fixed length.
+	 * @param non-empty-string $column_name The column name.
+	 * @param positive-int     $length      The fixed length.
 	 *
 	 * @phpstan-param non-empty-string $column_name
 	 * @phpstan-param positive-int $length
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function binary( string $column_name, int $length = 1 ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::BINARY, [ max( 1, $length ) ] ) );
@@ -434,15 +368,12 @@ final class Create_Table_Schema {
 	/**
 	 * Add a VARBINARY column (variable-length binary string).
 	 *
-	 * @param string $column_name The column name.
-	 * @param int    $length      The maximum length.
-	 *
-	 * @phpstan-param non-empty-string $column_name
-	 * @phpstan-param positive-int $length
+	 * @param non-empty-string $column_name The column name.
+	 * @param positive-int     $length      The maximum length.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function var_binary( string $column_name, int $length = 1 ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::VARBINARY, [ max( 1, $length ) ] ) );
@@ -451,13 +382,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a UUID column as CHAR(36).
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function uuid( string $column_name ): Column_Definition {
 		return $this->char( $column_name, 36 );
@@ -466,13 +395,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a TEXT column (max ~64 KB).
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function text( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::TEXT ) );
@@ -481,13 +408,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a TINYTEXT column (max 255 bytes).
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function tiny_text( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::TINYTEXT ) );
@@ -496,13 +421,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a MEDIUMTEXT column (max ~16MB).
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function medium_text( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::MEDIUMTEXT ) );
@@ -511,13 +434,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a LONGTEXT column (max ~4GB).
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function long_text( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::LONGTEXT ) );
@@ -526,13 +447,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a BLOB column.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function blob( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::BLOB ) );
@@ -541,13 +460,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a TINYBLOB column.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function tiny_blob( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::TINYBLOB ) );
@@ -556,13 +473,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a MEDIUMBLOB column.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function medium_blob( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::MEDIUMBLOB ) );
@@ -571,13 +486,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a LONGBLOB column.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function long_blob( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::LONGBLOB ) );
@@ -586,36 +499,26 @@ final class Create_Table_Schema {
 	/**
 	 * Add a BIT column.
 	 *
-	 * @param string $column_name The column name.
-	 * @param int    $length      The number of bits (1-64).
-	 *
-	 * @phpstan-param non-empty-string $column_name
-	 * @phpstan-param int<1, 64> $length
+	 * @param non-empty-string $column_name The column name.
+	 * @param int<1,64>        $length      The number of bits (1-64).
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function bit( string $column_name, int $length = 1 ): Column_Definition {
-		if ( $length < 1 || $length > 64 ) {
-			throw new Schema_Exception(
-				sprintf( 'Invalid length "%d" for BIT column "%s". Must be between 1 and 64.', $length, $column_name )
-			);
-		}
-
+		$length = max( 1, min( 64, $length ) );
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::BIT, [ $length ] ) );
 	}
 
 	/**
 	 * Add a GEOMETRY column for storing any type of spatial data.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function geometry( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::GEOMETRY ) );
@@ -624,13 +527,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a POINT column for storing a single lat/lng coordinate.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function point( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::POINT ) );
@@ -639,13 +540,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a LINESTRING column for storing a series of points (e.g., a route).
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function linestring( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::LINESTRING ) );
@@ -654,13 +553,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a POLYGON column for storing a shape (e.g., a delivery zone).
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function polygon( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::POLYGON ) );
@@ -669,13 +566,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a MULTIPOINT column for storing a collection of points.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function multipoint( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::MULTIPOINT ) );
@@ -684,13 +579,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a MULTILINESTRING column for storing multiple line strings.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function multilinestring( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::MULTILINESTRING ) );
@@ -699,13 +592,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a MULTIPOLYGON column for storing multiple polygons.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function multipolygon( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::MULTIPOLYGON ) );
@@ -714,13 +605,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a GEOMETRYCOLLECTION column for storing a collection of geometries.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function geometrycollection( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::GEOMETRYCOLLECTION ) );
@@ -729,13 +618,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a JSON column.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function json( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::JSON ) );
@@ -744,13 +631,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a DATE column.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function date( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::DATE ) );
@@ -759,25 +644,18 @@ final class Create_Table_Schema {
 	/**
 	 * Add a TIME column.
 	 *
-	 * @param string   $column_name The column name.
-	 * @param int|null $precision   Fractional seconds precision (0-6).
-	 *
-	 * @phpstan-param non-empty-string $column_name
-	 * @phpstan-param null|int<0, 6> $precision
+	 * @param non-empty-string $column_name The column name.
+	 * @param int<0,6>|null    $precision   Fractional seconds precision (0-6).
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function time( string $column_name, ?int $precision = null ): Column_Definition {
 		$args = [];
 		if ( null !== $precision ) {
-			if ( $precision < 0 || $precision > 6 ) {
-				throw new Schema_Exception(
-					sprintf( 'Precision must be between 0 and 6, %d was provided for column "%s".', $precision, $column_name )
-				);
-			}
-			$args[] = $precision;
+			$precision = max( 0, min( 6, $precision ) );
+			$args[]    = $precision;
 		}
 
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::TIME, $args ) );
@@ -786,25 +664,17 @@ final class Create_Table_Schema {
 	/**
 	 * Add a DATETIME column.
 	 *
-	 * @param string   $column_name The column name.
-	 * @param int|null $precision   Fractional seconds precision (0-6).
-	 *
-	 * @phpstan-param non-empty-string $column_name
-	 * @phpstan-param null|int<0, 6> $precision
+	 * @param non-empty-string $column_name The column name.
+	 * @param null|int<0,6>    $precision   Fractional seconds precision (0-6).
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function datetime( string $column_name, ?int $precision = null ): Column_Definition {
 		$args = [];
 		if ( null !== $precision ) {
-			if ( $precision < 0 || $precision > 6 ) {
-				throw new Schema_Exception(
-					sprintf( 'Precision must be between 0 and 6, %d was provided for column "%s".', $precision, $column_name )
-				);
-			}
-			$args[] = $precision;
+			$args[] = max( 0, min( 6, $precision ) );
 		}
 
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::DATETIME, $args ) );
@@ -813,25 +683,18 @@ final class Create_Table_Schema {
 	/**
 	 * Add a TIMESTAMP column.
 	 *
-	 * @param string   $column_name The column name.
-	 * @param int|null $precision   Fractional seconds precision (0-6).
-	 *
-	 * @phpstan-param non-empty-string $column_name
-	 * @phpstan-param null|int<0, 6> $precision
+	 * @param non-empty-string $column_name The column name.
+	 * @param null|int<0,6>    $precision   Fractional seconds precision (0-6).
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function timestamp( string $column_name, ?int $precision = null ): Column_Definition {
 		$args = [];
 		if ( null !== $precision ) {
-			if ( $precision < 0 || $precision > 6 ) {
-				throw new Schema_Exception(
-					sprintf( 'Precision must be between 0 and 6, %d was provided for column "%s".', $precision, $column_name )
-				);
-			}
-			$args[] = $precision;
+			$precision = max( 0, min( 6, $precision ) );
+			$args[]    = $precision;
 		}
 
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::TIMESTAMP, $args ) );
@@ -840,13 +703,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a YEAR column.
 	 *
-	 * @param string $column_name The column name.
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function year( string $column_name ): Column_Definition {
 		return $this->add_column( new Column_Definition( $column_name, Column_Type::YEAR ) );
@@ -855,22 +716,22 @@ final class Create_Table_Schema {
 	/**
 	 * Add an ENUM column.
 	 *
-	 * @param string   $column_name The column name.
-	 * @param string[] $values      Allowed values.
-	 *
-	 * @phpstan-param non-empty-string $column_name
-	 * @phpstan-param list<non-empty-string> $values
+	 * @param non-empty-string       $column_name The column name.
+	 * @param list<non-empty-string> $values      Allowed values.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
+	 * @throws Schema_Exception When values are empty or too long.
+	 * @throws Schema_Exception When values contain a comma.
+	 * @throws Schema_Exception When values are not unique.
 	 */
 	public function enum( string $column_name, array $values ): Column_Definition {
-		if ( empty( $values ) ) {
+		if ( 0 === count( $values ) ) {
 			throw new Schema_Exception( sprintf( 'ENUM column "%s" must have at least one value.', $column_name ) );
 		}
 
-		if ( count( $values ) > 65535 ) {
+		if ( 65535 < count( $values ) ) {
 			throw new Schema_Exception( sprintf( 'ENUM column "%s" has too many values (max 65535).', $column_name ) );
 		}
 
@@ -880,10 +741,10 @@ final class Create_Table_Schema {
 
 		$escaped = [];
 		foreach ( $values as $value ) {
-			if ( trim( $value ) === '' ) {
+			if ( '' === trim( $value ) ) {
 				throw new Schema_Exception( sprintf( 'ENUM values for column "%s" must be non-empty strings.', $column_name ) );
 			}
-			if ( strlen( $value ) > 255 ) {
+			if ( 255 < strlen( $value ) ) {
 				throw new Schema_Exception( sprintf( 'ENUM value "%s" for column "%s" is too long (max 255).', $value, $column_name ) );
 			}
 			$escaped[] = "'" . Util::escape_sql( $value ) . "'";
@@ -895,22 +756,19 @@ final class Create_Table_Schema {
 	/**
 	 * Add a SET column.
 	 *
-	 * @param string   $column_name The column name.
-	 * @param string[] $values      Allowed values.
-	 *
-	 * @phpstan-param non-empty-string $column_name
-	 * @phpstan-param list<non-empty-string> $values
+	 * @param non-empty-string       $column_name The column name.
+	 * @param list<non-empty-string> $values      Allowed values.
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function set( string $column_name, array $values ): Column_Definition {
-		if ( empty( $values ) ) {
+		if ( 0 === count( $values ) ) {
 			throw new Schema_Exception( sprintf( 'SET column "%s" must have at least one value.', $column_name ) );
 		}
 
-		if ( count( $values ) > 64 ) {
+		if ( 64 < count( $values ) ) {
 			throw new Schema_Exception( sprintf( 'SET column "%s" has too many values (max 64).', $column_name ) );
 		}
 
@@ -920,7 +778,7 @@ final class Create_Table_Schema {
 
 		$escaped = [];
 		foreach ( $values as $value ) {
-			if ( trim( $value ) === '' ) {
+			if ( '' === trim( $value ) ) {
 				throw new Schema_Exception( sprintf( 'SET members for column "%s" must be non-empty strings.', $column_name ) );
 			}
 			if ( str_contains( $value, ',' ) ) {
@@ -941,13 +799,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add an auto-incrementing BIGINT UNSIGNED primary key.
 	 *
-	 * @param string $column_name The column name (default: 'id').
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name (default: 'id').
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function id( string $column_name = 'id' ): Column_Definition {
 		return $this->big_integer( $column_name )->unsigned()->auto_increment()->primary();
@@ -960,7 +816,8 @@ final class Create_Table_Schema {
 	 *
 	 * @return self
 	 *
-	 * @throws Schema_Exception If the underlying column definitions fail or schema is compiled.
+	 * @noinspection PhpUnhandledExceptionInspection
+	 * @noinspection PhpDocMissingThrowsInspection
 	 */
 	public function timestamps( bool $use_current_timestamp = true ): self {
 		if ( $use_current_timestamp ) {
@@ -976,13 +833,11 @@ final class Create_Table_Schema {
 	/**
 	 * Add a nullable `deleted_at` DATETIME column for soft deletes.
 	 *
-	 * @param string $column_name The column name (default: 'deleted_at').
-	 *
-	 * @phpstan-param non-empty-string $column_name
+	 * @param non-empty-string $column_name The column name (default: 'deleted_at').
 	 *
 	 * @return Column_Definition
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function soft_deletes( string $column_name = 'deleted_at' ): Column_Definition {
 		return $this->datetime( $column_name )->nullable();
@@ -993,13 +848,11 @@ final class Create_Table_Schema {
 	 *
 	 * Creates `{name}_id` (BIGINT UNSIGNED) and `{name}_type` (VARCHAR) columns, with a composite index.
 	 *
-	 * @param string $name The base name (e.g., 'commentable').
-	 *
-	 * @phpstan-param non-empty-string $name
+	 * @param non-empty-string $name The base name (e.g., 'commentable').
 	 *
 	 * @return self
 	 *
-	 * @throws Schema_Exception On invalid parameters or if schema is already compiled.
+	 * @throws Schema_Exception When column name is invalid SQL identifier.
 	 */
 	public function morphs( string $name ): self {
 		$this->big_integer( "{$name}_id" )->unsigned();
@@ -1017,15 +870,16 @@ final class Create_Table_Schema {
 	/**
 	 * Adds an index definition.
 	 *
-	 * @param string|string[] $columns Column name(s).
-	 * @param string|null     $name    Index name.
-	 * @param string          $type    Index type.
+	 * @param non-empty-string|list<non-empty-string> $columns Column name(s).
+	 * @param non-empty-string|null                   $name    Index name.
+	 * @param string                                  $type    Index type.
 	 *
-	 * @phpstan-param non-empty-string|list<non-empty-string> $columns
-	 * @phpstan-param non-empty-string|null $name
-	 * @phpstan-param Supported_Index_Type $type
+	 * @phpstan-param Index_Types_Excluding_Primary $type
+	 * @psalm-param Index_Types_Excluding_Primary $type
 	 *
 	 * @return Index_Definition
+	 *
+	 * @throws Schema_Exception When index name is invalid SQL identifier.
 	 */
 	public function add_index(
 		string|array $columns,
@@ -1035,9 +889,9 @@ final class Create_Table_Schema {
 
 		$prefix = match ( $type ) {
 			Index_Type::UNIQUE   => 'uq',
-			Index_Type::INDEX    => 'idx',
 			Index_Type::FULLTEXT => 'ft',
 			Index_Type::SPATIAL  => 'sp',
+			default              => 'idx',
 		};
 
 		$columns = (array) $columns;
@@ -1052,15 +906,12 @@ final class Create_Table_Schema {
 	/**
 	 * Add a unique key.
 	 *
-	 * @param string|string[] $columns Column name(s).
-	 * @param string|null     $name    Custom key name.
-	 *
-	 * @phpstan-param non-empty-string|list<non-empty-string> $columns
-	 * @phpstan-param non-empty-string|null $name
+	 * @param non-empty-string|list<non-empty-string> $columns Column name(s).
+	 * @param non-empty-string|null                   $name    Custom key name.
 	 *
 	 * @return Index_Definition
 	 *
-	 * @throws Schema_Exception When parameters are invalid or schema is compiled.
+	 * @throws Schema_Exception When index name is invalid SQL identifier.
 	 */
 	public function add_unique_key( string|array $columns, ?string $name = null ): Index_Definition {
 		return $this->add_index( $columns, $name, Index_Type::UNIQUE );
@@ -1069,15 +920,12 @@ final class Create_Table_Schema {
 	/**
 	 * Add a fulltext key.
 	 *
-	 * @param string|string[] $columns Column name(s).
-	 * @param string|null     $name    Custom key name.
-	 *
-	 * @phpstan-param non-empty-string|list<non-empty-string> $columns
-	 * @phpstan-param non-empty-string|null $name
+	 * @param non-empty-string|list<non-empty-string> $columns Column name(s).
+	 * @param non-empty-string|null                   $name    Custom key name.
 	 *
 	 * @return Index_Definition
 	 *
-	 * @throws Schema_Exception When parameters are invalid or schema is compiled.
+	 * @throws Schema_Exception When index name is invalid SQL identifier.
 	 */
 	public function add_fulltext_key( string|array $columns, ?string $name = null ): Index_Definition {
 		return $this->add_index( $columns, $name, Index_Type::FULLTEXT );
@@ -1086,15 +934,12 @@ final class Create_Table_Schema {
 	/**
 	 * Add a spatial key.
 	 *
-	 * @param string|string[] $columns Column name(s).
-	 * @param string|null     $name    Custom key name.
-	 *
-	 * @phpstan-param non-empty-string|list<non-empty-string> $columns
-	 * @phpstan-param non-empty-string|null $name
+	 * @param non-empty-string|list<non-empty-string> $columns Column name(s).
+	 * @param non-empty-string|null                   $name    Custom key name.
 	 *
 	 * @return Index_Definition
 	 *
-	 * @throws Schema_Exception When parameters are invalid or schema is compiled.
+	 * @throws Schema_Exception When index name is invalid SQL identifier.
 	 */
 	public function add_spatial_key( string|array $columns, ?string $name = null ): Index_Definition {
 		return $this->add_index( $columns, $name, Index_Type::SPATIAL );
@@ -1103,15 +948,12 @@ final class Create_Table_Schema {
 	/**
 	 * Add a foreign key constraint.
 	 *
-	 * @param string|string[] $columns Local column name(s).
-	 * @param string|null     $name    Custom constraint name.
-	 *
-	 * @phpstan-param non-empty-string|list<non-empty-string> $columns
-	 * @phpstan-param non-empty-string|null $name
+	 * @param non-empty-string|list<non-empty-string> $columns Local column name(s).
+	 * @param non-empty-string|null                   $name    Custom constraint name.
 	 *
 	 * @return Foreign_Key_Definition
 	 *
-	 * @throws Schema_Exception When parameters are invalid or schema is compiled.
+	 * @throws Schema_Exception When the constraint name is invalid or columns are empty/invalid.
 	 */
 	public function add_foreign_key( string|array $columns, ?string $name = null ): Foreign_Key_Definition {
 		$columns_array = (array) $columns;
@@ -1130,9 +972,7 @@ final class Create_Table_Schema {
 	/**
 	 * Set the storage engine.
 	 *
-	 * @param string $engine Engine name (e.g., 'InnoDB', 'MyISAM').
-	 *
-	 * @phpstan-param non-empty-string $engine
+	 * @param non-empty-string $engine Engine name (e.g., 'InnoDB', 'MyISAM').
 	 *
 	 * @return self
 	 */
@@ -1144,9 +984,7 @@ final class Create_Table_Schema {
 	/**
 	 * Set the default character set.
 	 *
-	 * @param string $charset Character set name.
-	 *
-	 * @phpstan-param non-empty-string $charset
+	 * @param non-empty-string $charset Character set name.
 	 *
 	 * @return self
 	 */
@@ -1158,9 +996,7 @@ final class Create_Table_Schema {
 	/**
 	 * Set the default collation.
 	 *
-	 * @param string $collation Collation name.
-	 *
-	 * @phpstan-param non-empty-string $collation
+	 * @param non-empty-string $collation Collation name.
 	 *
 	 * @return self
 	 */
@@ -1172,9 +1008,7 @@ final class Create_Table_Schema {
 	/**
 	 * Set a table comment.
 	 *
-	 * @param string $comment Comment text.
-	 *
-	 * @phpstan-param non-empty-string $comment
+	 * @param non-empty-string $comment Comment text.
 	 *
 	 * @return self
 	 */
@@ -1186,9 +1020,7 @@ final class Create_Table_Schema {
 	/**
 	 * Set the AUTO_INCREMENT starting value.
 	 *
-	 * @param int $value Starting value.
-	 *
-	 * @phpstan-param positive-int $value
+	 * @param positive-int $value Starting value.
 	 *
 	 * @return self
 	 */
@@ -1216,9 +1048,7 @@ final class Create_Table_Schema {
 	/**
 	 * Generate the CREATE TABLE SQL statement.
 	 *
-	 * @return string The complete SQL statement.
-	 *
-	 * @phpstan-return non-empty-string
+	 * @return non-empty-string The complete SQL statement.
 	 *
 	 * @throws Schema_Exception If validation fails.
 	 */
@@ -1268,9 +1098,7 @@ final class Create_Table_Schema {
 	/**
 	 * Get the full table name.
 	 *
-	 * @return string
-	 *
-	 * @phpstan-return non-empty-string
+	 * @return non-empty-string
 	 */
 	public function get_table_name(): string {
 		return $this->table_name;
@@ -1279,9 +1107,7 @@ final class Create_Table_Schema {
 	/**
 	 * Get the short table name.
 	 *
-	 * @return string
-	 *
-	 * @phpstan-return non-empty-string
+	 * @return non-empty-string
 	 */
 	public function get_short_table_name(): string {
 		return $this->short_table_name;
@@ -1290,7 +1116,7 @@ final class Create_Table_Schema {
 	/**
 	 * Compile column intents into concrete table-level definitions.
 	 *
-	 * @throws Schema_Exception If schema is already compiled.
+	 * @throws Schema_Exception When an index name is invalid SQL identifier.
 	 */
 	private function compile(): void {
 		foreach ( $this->columns as $column ) {
@@ -1320,7 +1146,7 @@ final class Create_Table_Schema {
 	 * @throws Schema_Exception If any schema rule is violated.
 	 */
 	private function validate(): void {
-		if ( empty( $this->columns ) ) {
+		if ( 0 === count( $this->columns ) ) {
 			throw new Schema_Exception( 'Cannot create a table with no columns.' );
 		}
 
@@ -1377,9 +1203,9 @@ final class Create_Table_Schema {
 			}
 
 			foreach ( $this->indexes as $index ) {
-				if ( $index->get_type() === Index_Type::UNIQUE ) {
+				if ( Index_Type::UNIQUE === $index->get_type() ) {
 					$index_columns = $index->get_columns();
-					if ( ! empty( $index_columns ) && $index_columns[0] === $auto_increment_column ) {
+					if ( [] !== $index_columns && $index_columns[0] === $auto_increment_column ) {
 						return;
 					}
 				}

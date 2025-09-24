@@ -1,6 +1,6 @@
 <?php
 /**
- * Foreign key actions constants
+ * Foreign key actions constants.
  *
  * @package WPTechnix\WP_Tables_Schema\Constants
  */
@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace WPTechnix\WP_Tables_Schema\Constants;
 
 /**
- * Foreign key actions constants
+ * Foreign key actions constants.
  */
 final class Foreign_Key_Action {
 
@@ -20,17 +20,9 @@ final class Foreign_Key_Action {
 	public const NO_ACTION = 'NO ACTION';
 
 	/**
-	 * Private constructor to prevent instantiation.
-	 */
-	private function __construct() {
-	}
-
-	/**
 	 * Get all actions.
 	 *
-	 * @return string[]
-	 *
-	 * @phpstan-return list<self::*>
+	 * @return list<self::*>
 	 */
 	public static function get_all(): array {
 		return [

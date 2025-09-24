@@ -14,5 +14,5 @@ use Exception;
 /**
  * Exception thrown when schema validation fails.
  */
-class Schema_Exception extends Exception {
+final class Schema_Exception extends Exception {
 }

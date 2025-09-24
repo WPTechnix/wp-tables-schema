@@ -33,13 +33,6 @@ class Test_Migration_Table extends Table {
 	protected string $table_singular_name = 'migration';
 
 	/**
-	 * Alias for the table.
-	 *
-	 * @var string
-	 */
-	protected string $table_alias = 'mig';
-
-	/**
 	 * Name of the primary key column.
 	 *
 	 * @var string

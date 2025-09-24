@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace WPTechnix\WP_Tables_Schema;
 
 use wpdb;
+use WPTechnix\WP_Tables_Schema\Exceptions\Schema_Exception;
 use WPTechnix\WP_Tables_Schema\Schema\Create_Table_Schema;
 use WPTechnix\WP_Tables_Schema\Interfaces\Table_Interface;
 use WPTechnix\WP_Tables_Schema\Constants\Foreign_Key_Action;
@@ -20,26 +21,23 @@ use WPTechnix\WP_Tables_Schema\Constants\Foreign_Key_Action;
 abstract class Meta_Table extends Table {
 
 	/**
-	 * Schema Version
+	 * Schema Version.
 	 *
-	 * @var int
-	 * @phpstan-var positive-int
+	 * @var positive-int
 	 */
 	protected int $schema_version = 10001;
 
 	/**
-	 * Primary key column
+	 * Primary key column.
 	 *
-	 * @var string
-	 * @phpstan-var non-empty-string
+	 * @var non-empty-string
 	 */
 	protected string $primary_key_column = 'meta_id';
 
 	/**
 	 * Foreign column name.
 	 *
-	 * @var string
-	 * @phpstan-var non-empty-string
+	 * @var non-empty-string
 	 */
 	protected string $foreign_column_name;
 
@@ -49,17 +47,18 @@ abstract class Meta_Table extends Table {
 	 *
 	 * @var null|string
 	 * @phpstan-var null|Foreign_Key_Action::*
+	 * @psalm-var null|Foreign_Key_Action::*
 	 */
 	protected ?string $on_delete_action = Foreign_Key_Action::RESTRICT;
 
 	/**
 	 * Meta Table Constructor.
 	 *
-	 * @param Table_Interface $parent_table Parent Table.
-	 * @param wpdb            $wpdb WP Database object.
-	 * @param string|null     $plugin_prefix Plugin Prefix.
+	 * @param Table_Interface       $parent_table Parent Table.
+	 * @param wpdb                  $wpdb WP Database object.
+	 * @param non-empty-string|null $plugin_prefix Plugin Prefix.
 	 *
-	 * @phpstan-param non-empty-string|null $plugin_prefix
+	 * @throws Schema_Exception When defined property identifiers are invalid.
 	 */
 	public function __construct(
 		protected Table_Interface $parent_table,
@@ -67,29 +66,42 @@ abstract class Meta_Table extends Table {
 		?string $plugin_prefix = null
 	) {
 
-		$this->table_singular_name = $this->get_table_singular_name() . 'meta';
+		// Set the meta table names based on parent table.
+		$parent_singular = $parent_table->get_table_singular_name();
+
+		// Remove plugin prefix if it exists in parent singular name.
+		if ( null !== $plugin_prefix && str_starts_with( $parent_singular, $plugin_prefix ) ) {
+			$parent_singular = substr( $parent_singular, strlen( $plugin_prefix ) );
+		}
+
+		$this->table_singular_name = $parent_singular . 'meta';
 		$this->table_name          = $this->table_singular_name;
 
 		parent::__construct( $wpdb, $plugin_prefix );
 
-		$this->foreign_column_name = $this->parent_table->get_table_singular_name() . '_id';
+		$this->foreign_column_name = $parent_table->get_table_singular_name() . '_id';
+		$this->foreign_key_name    = $parent_table->get_table_singular_name() . '_id';
 
 		$this->wpdb->{$this->get_table_singular_name() . 'meta'} = $this->get_table_name();
 	}
 
 	/**
 	 * Create Meta Table.
+	 *
+	 * @return bool
+	 * @noinspection PhpUnhandledExceptionInspection
+	 * @noinspection PhpDocMissingThrowsInspection
 	 */
 	protected function migrate_to_10001(): bool {
 		return $this->create_table(
-			function ( Create_Table_Schema $schema ) {
+			function ( Create_Table_Schema $schema ): Create_Table_Schema {
 
 				$schema->id( $this->get_primary_key() );
 
 				$schema
-				->big_integer( $this->foreign_column_name )
-				->unsigned()
-				->index( $this->foreign_column_name );
+					->big_integer( $this->foreign_column_name )
+					->unsigned()
+					->index( $this->foreign_column_name );
 
 				// Add the standard meta_key and meta_value columns.
 				$schema->string( 'meta_key', 191 )->index( 'meta_key' );
@@ -97,12 +109,12 @@ abstract class Meta_Table extends Table {
 
 				// Add a foreign key constraint to the parent table for data integrity.
 				$fk = $schema->add_foreign_key( $this->foreign_column_name )
-						->references(
-							$this->parent_table->get_table_name(),
-							$this->parent_table->get_primary_key()
-						);
+							->references(
+								$this->parent_table->get_table_name(),
+								$this->parent_table->get_primary_key()
+							);
 
-				if ( isset( $this->on_delete_action ) ) {
+				if ( null !== $this->on_delete_action ) {
 					$fk->on_delete( $this->on_delete_action );
 				}
 

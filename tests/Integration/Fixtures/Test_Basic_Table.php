@@ -34,13 +34,6 @@ class Test_Basic_Table extends Table {
 	protected string $table_singular_name = 'basic';
 
 	/**
-	 * The alias of the table.
-	 *
-	 * @var string
-	 */
-	protected string $table_alias = 'bas';
-
-	/**
 	 * The name of the primary key column.
 	 *
 	 * @var string
