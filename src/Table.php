@@ -351,10 +351,7 @@ abstract class Table implements Table_Interface, LoggerAwareInterface {
 	/**
 	 * Creates the table using a fluent schema builder.
 	 *
-	 * @param Closure $closure The closure that builds the table.
-	 *
-	 * @phpstan-param (Closure(Create_Table_Schema): (Create_Table_Schema|non-empty-string)) $closure
-	 * @psalm-param (Closure(Create_Table_Schema): (Create_Table_Schema|non-empty-string)) $closure
+	 * @param (Closure(Create_Table_Schema): (Create_Table_Schema|non-empty-string)) $closure The closure that builds the table.
 	 *
 	 * @return bool
 	 *

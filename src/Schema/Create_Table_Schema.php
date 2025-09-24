@@ -354,9 +354,6 @@ final class Create_Table_Schema {
 	 * @param non-empty-string $column_name The column name.
 	 * @param positive-int     $length      The fixed length.
 	 *
-	 * @phpstan-param non-empty-string $column_name
-	 * @phpstan-param positive-int $length
-	 *
 	 * @return Column_Definition
 	 *
 	 * @throws Schema_Exception When column name is invalid SQL identifier.
