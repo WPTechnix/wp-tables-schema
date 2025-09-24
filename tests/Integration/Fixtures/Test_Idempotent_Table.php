@@ -29,11 +29,6 @@ class Test_Idempotent_Table extends Table {
 	protected string $table_singular_name = 'idempotent';
 
 	/**
-	 * @var string $table_alias The alias of the table.
-	 */
-	protected string $table_alias = 'ide';
-
-	/**
 	 * @var string $primary_key_column The primary key column of the table.
 	 */
 	protected string $primary_key_column = 'id';

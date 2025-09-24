@@ -35,13 +35,6 @@ class Test_Failing_Migration_Table extends Table {
 	protected string $table_singular_name = 'failing';
 
 	/**
-	 * The alias of the table.
-	 *
-	 * @var string
-	 */
-	protected string $table_alias = 'fai';
-
-	/**
 	 * The primary key column of the table.
 	 *
 	 * @var string

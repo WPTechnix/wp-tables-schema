@@ -108,7 +108,6 @@ final class Table_Test extends WP_UnitTestCase {
 		);
 		self::assertStringContainsString( 'basic', $table->get_table_name(), 'Table name should contain base name' );
 
-		self::assertEquals( 'bas', $table->get_table_alias(), 'Table alias should be "bas"' );
 		self::assertEquals( 'id', $table->get_primary_key(), 'Primary key should be "id"' );
 		self::assertEquals( 'basic_id', $table->get_foreign_key_name(), 'Foreign key name should be "basic_id"' );
 		self::assertEquals( 10001, $table->get_schema_version(), 'Schema version should be 10001' );

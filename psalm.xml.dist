@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="2"
+    resolveFromConfigFile="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+>
+    <projectFiles>
+        <directory name="src"/>
+        <ignoreFiles>
+            <directory name="vendor"/>
+        </ignoreFiles>
+    </projectFiles>
+    <issueHandlers>
+        <PossiblyUnusedMethod>
+            <errorLevel type="suppress">
+                <directory name="src/Schema" />
+                <directory name="src/Constants" />
+                <file name="src/Table.php" />
+                <file name="src/Meta_Table.php" />
+                <file name="src/Interfaces/Table_Interface.php" />
+            </errorLevel>
+        </PossiblyUnusedMethod>
+        <MixedAssignment>
+            <errorLevel type="suppress">
+                <file name="src/Table.php"/>
+            </errorLevel>
+        </MixedAssignment>
+        <PropertyNotSetInConstructor>
+            <errorLevel type="suppress">
+                <file name="src/Table.php" />
+                <file name="src/Schema/Foreign_Key_Definition.php" />
+            </errorLevel>
+        </PropertyNotSetInConstructor>
+        <PossiblyUnusedReturnValue>
+            <errorLevel type="suppress">
+                <file name="src/Schema/Create_Table_Schema.php" />
+            </errorLevel>
+        </PossiblyUnusedReturnValue>
+        <UnusedClass>
+            <errorLevel type="suppress">
+                <file name="src/Meta_Table.php"/>
+            </errorLevel>
+        </UnusedClass>
+    </issueHandlers>
+    <plugins>
+        <pluginClass class="PsalmWordPress\Plugin"/>
+    </plugins>
+</psalm>

@@ -21,32 +21,28 @@ final class Foreign_Key_Definition {
 	/**
 	 * The constraint name.
 	 *
-	 * @var string
-	 * @phpstan-var non-empty-string
+	 * @var non-empty-string
 	 */
 	private string $name;
 
 	/**
 	 * The local column(s).
 	 *
-	 * @var array
-	 * @phpstan-var list<non-empty-string>
+	 * @var list<non-empty-string>
 	 */
 	private array $columns;
 
 	/**
 	 * The referenced table name.
 	 *
-	 * @var string
-	 * @phpstan-var non-empty-string
+	 * @var non-empty-string
 	 */
 	private string $references_table;
 
 	/**
 	 * The referenced column(s).
 	 *
-	 * @var array
-	 * @phpstan-var list<non-empty-string>
+	 * @var list<non-empty-string>
 	 */
 	private array $references_columns;
 
@@ -55,6 +51,7 @@ final class Foreign_Key_Definition {
 	 *
 	 * @var string
 	 * @phpstan-var Foreign_Key_Action::*
+	 * @psalm-var Foreign_Key_Action::*
 	 */
 	private string $on_delete = Foreign_Key_Action::RESTRICT;
 
@@ -63,17 +60,15 @@ final class Foreign_Key_Definition {
 	 *
 	 * @var string
 	 * @phpstan-var Foreign_Key_Action::*
+	 * @psalm-var Foreign_Key_Action::*
 	 */
 	private string $on_update = Foreign_Key_Action::RESTRICT;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param string       $name    The constraint name.
-	 * @param string|array $columns The local column name(s).
-	 *
-	 * @phpstan-param non-empty-string $name
-	 * @phpstan-param non-empty-string|list<non-empty-string> $columns
+	 * @param non-empty-string                        $name    The constraint name.
+	 * @param non-empty-string|list<non-empty-string> $columns The local column name(s).
 	 *
 	 * @throws Schema_Exception When the constraint name is invalid or columns are empty/invalid.
 	 */
@@ -91,7 +86,7 @@ final class Foreign_Key_Definition {
 
 		$validated_columns = (array) $columns;
 
-		if ( empty( $validated_columns ) ) {
+		if ( 0 === count( $validated_columns ) ) {
 			throw new Schema_Exception(
 				sprintf(
 					'Foreign key "%s" must have at least one local column.',
@@ -102,6 +97,7 @@ final class Foreign_Key_Definition {
 
 		foreach ( $validated_columns as $column ) {
 			if ( ! Util::valid_sql_identifier( $column ) ) {
+				/** @psalm-suppress DocblockTypeContradiction,RedundantConditionGivenDocblockType */
 				throw new Schema_Exception(
 					sprintf(
 						'The local column name "%s" for foreign key "%s" is invalid.',
@@ -119,11 +115,8 @@ final class Foreign_Key_Definition {
 	/**
 	 * Sets the referenced table and column(s).
 	 *
-	 * @param string       $table   The referenced table's complete name (including wpdb prefix).
-	 * @param string|array $columns The referenced column name(s). Defaults to 'id'.
-	 *
-	 * @phpstan-param non-empty-string $table
-	 * @phpstan-param non-empty-string|list<non-empty-string> $columns
+	 * @param non-empty-string                        $table   The referenced table's complete name (including wpdb prefix).
+	 * @param non-empty-string|list<non-empty-string> $columns The referenced column name(s). Defaults to 'id'.
 	 *
 	 * @return self The current instance for fluent method chaining.
 	 *
@@ -142,7 +135,7 @@ final class Foreign_Key_Definition {
 
 		$validated_columns = (array) $columns;
 
-		if ( empty( $validated_columns ) ) {
+		if ( 0 === count( $validated_columns ) ) {
 			throw new Schema_Exception(
 				sprintf(
 					'Foreign key "%s" must reference at least one column.',
@@ -153,6 +146,7 @@ final class Foreign_Key_Definition {
 
 		foreach ( $validated_columns as $column ) {
 			if ( ! Util::valid_sql_identifier( $column ) ) {
+				/** @psalm-suppress DocblockTypeContradiction,RedundantConditionGivenDocblockType */
 				throw new Schema_Exception(
 					sprintf(
 						'The referenced column name "%s" for foreign key "%s" is invalid.',
@@ -173,6 +167,7 @@ final class Foreign_Key_Definition {
 	 * Sets the action for ON DELETE.
 	 *
 	 * @param string $action The action (e.g., 'CASCADE', 'SET NULL').
+	 * @psalm-param Foreign_Key_Action::* $action
 	 * @phpstan-param Foreign_Key_Action::* $action
 	 *
 	 * @return self The current instance for fluent method chaining.
@@ -180,7 +175,6 @@ final class Foreign_Key_Definition {
 	 * @throws Schema_Exception When an invalid action is provided.
 	 */
 	public function on_delete( string $action ): self {
-		$action = strtoupper( trim( $action ) );
 		if ( ! in_array( $action, Foreign_Key_Action::get_all(), true ) ) {
 			throw new Schema_Exception(
 				sprintf(
@@ -193,7 +187,6 @@ final class Foreign_Key_Definition {
 			);
 		}
 
-		/** @phpstan-var Foreign_Key_Action::* $action */
 		$this->on_delete = $action;
 		return $this;
 	}
@@ -203,13 +196,13 @@ final class Foreign_Key_Definition {
 	 *
 	 * @param string $action The action (e.g., 'CASCADE', 'SET NULL').
 	 * @phpstan-param Foreign_Key_Action::* $action
+	 * @psalm-param Foreign_Key_Action::* $action
 	 *
 	 * @return self The current instance for fluent method chaining.
 	 *
 	 * @throws Schema_Exception When an invalid action is provided.
 	 */
 	public function on_update( string $action ): self {
-		$action = strtoupper( trim( $action ) );
 		if ( ! in_array( $action, Foreign_Key_Action::get_all(), true ) ) {
 			throw new Schema_Exception(
 				sprintf(
@@ -222,7 +215,6 @@ final class Foreign_Key_Definition {
 			);
 		}
 
-		/** @phpstan-var Foreign_Key_Action::* $action */
 		$this->on_update = $action;
 		return $this;
 	}
@@ -231,6 +223,8 @@ final class Foreign_Key_Definition {
 	 * Shorthand for CASCADE on both DELETE and UPDATE.
 	 *
 	 * @return self The current instance for fluent method chaining.
+	 * @noinspection PhpUnhandledExceptionInspection
+	 * @noinspection PhpDocMissingThrowsInspection
 	 */
 	public function cascade(): self {
 		$this->on_delete( Foreign_Key_Action::CASCADE );
@@ -244,6 +238,8 @@ final class Foreign_Key_Definition {
 	 * Note: The local column(s) must be nullable for this to work.
 	 *
 	 * @return self The current instance for fluent method chaining.
+	 * @noinspection PhpUnhandledExceptionInspection
+	 * @noinspection PhpDocMissingThrowsInspection
 	 */
 	public function nullify_on_delete(): self {
 		$this->on_delete( Foreign_Key_Action::SET_NULL );
@@ -253,8 +249,7 @@ final class Foreign_Key_Definition {
 	/**
 	 * Generates the SQL fragment for this foreign key constraint.
 	 *
-	 * @return string The SQL fragment for the CREATE TABLE statement.
-	 * @phpstan-return non-empty-string
+	 * @return non-empty-string The SQL fragment for the CREATE TABLE statement.
 	 *
 	 * @throws Schema_Exception If the foreign key definition is incomplete or invalid.
 	 */
@@ -305,9 +300,7 @@ final class Foreign_Key_Definition {
 	/**
 	 * Gets the local column names.
 	 *
-	 * @return array The column names.
-	 *
-	 * @phpstan-return list<non-empty-string>
+	 * @return list<non-empty-string> The column names.
 	 */
 	public function get_columns(): array {
 		return $this->columns;
@@ -316,9 +309,7 @@ final class Foreign_Key_Definition {
 	/**
 	 * Gets the constraint name.
 	 *
-	 * @return string The constraint name.
-	 *
-	 * @phpstan-return non-empty-string
+	 * @return non-empty-string The constraint name.
 	 */
 	public function get_name(): string {
 		return $this->name;

@@ -34,13 +34,6 @@ class Test_Parent_Table extends Table {
 	protected string $table_singular_name = 'parent';
 
 	/**
-	 * Table alias.
-	 *
-	 * @var string
-	 */
-	protected string $table_alias = 'par';
-
-	/**
 	 * Primary key column.
 	 *
 	 * @var string

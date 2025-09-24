@@ -34,13 +34,6 @@ class Test_Column_Operations_Table extends Table {
 	protected string $table_singular_name = 'columns';
 
 	/**
-	 * Table alias.
-	 *
-	 * @var string
-	 */
-	protected string $table_alias = 'col';
-
-	/**
 	 * Primary key column name.
 	 *
 	 * @var string

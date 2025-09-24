@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace WPTechnix\WP_Tables_Schema\Schema;
 
-use WPTechnix\WP_Tables_Schema\Constants\Index_Algorithm;
 use WPTechnix\WP_Tables_Schema\Constants\Index_Type;
 use WPTechnix\WP_Tables_Schema\Exceptions\Schema_Exception;
 use WPTechnix\WP_Tables_Schema\Util;
@@ -20,22 +19,21 @@ use WPTechnix\WP_Tables_Schema\Util;
  * @internal
  *
  * @phpstan-import-type Index_Types_Excluding_Primary from Index_Type
+ * @psalm-import-type Index_Types_Excluding_Primary from Index_Type
  */
 final class Index_Definition {
 
 	/**
 	 * The name of the index.
 	 *
-	 * @var string
-	 * @phpstan-var non-empty-string
+	 * @var non-empty-string
 	 */
 	private string $name;
 
 	/**
 	 * The list of columns to be indexed.
 	 *
-	 * @var array
-	 * @phpstan-var list<non-empty-string>
+	 * @var list<non-empty-string>
 	 */
 	private array $columns;
 
@@ -44,35 +42,25 @@ final class Index_Definition {
 	 *
 	 * @var string
 	 * @phpstan-var Index_Types_Excluding_Primary
+	 * @psalm-var Index_Types_Excluding_Primary
 	 */
 	private string $type;
 
 	/**
-	 * The algorithm used for the index (BTREE or HASH).
-	 *
-	 * @var string|null
-	 * @phpstan-var Index_Algorithm::*|null
-	 */
-	private ?string $using = null;
-
-	/**
 	 * Column prefix lengths for partial indexes, mapping column name to length.
 	 *
-	 * @var array
-	 * @phpstan-var array<non-empty-string, positive-int>
+	 * @var array<non-empty-string, positive-int>
 	 */
 	private array $column_lengths = [];
 
 	/**
 	 * Constructs an Index_Definition instance.
 	 *
-	 * @param string $name    The name for the index.
-	 * @param array  $columns The columns to include in the index. Must not be empty.
-	 * @param string $type    The type of index. Use `Index_Type` constants.
-	 *
-	 * @phpstan-param non-empty-string $name
-	 * @phpstan-param list<non-empty-string> $columns
+	 * @param non-empty-string       $name    The name for the index.
+	 * @param list<non-empty-string> $columns The columns to include in the index. Must not be empty.
+	 * @param string                 $type    The type of index. Use `Index_Type` constants.
 	 * @phpstan-param Index_Types_Excluding_Primary $type
+	 * @psalm-param Index_Types_Excluding_Primary $type
 	 *
 	 * @throws Schema_Exception If any provided parameters are invalid.
 	 */
@@ -92,7 +80,7 @@ final class Index_Definition {
 			);
 		}
 
-		if ( empty( $columns ) ) {
+		if ( 0 === count( $columns ) ) {
 			throw new Schema_Exception(
 				sprintf(
 					'Cannot define the index "%s" with an empty list of columns.' .
@@ -115,6 +103,7 @@ final class Index_Definition {
 
 		foreach ( $columns as $column ) {
 			if ( ! Util::valid_sql_identifier( $column ) ) {
+				/** @psalm-suppress DocblockTypeContradiction,RedundantConditionGivenDocblockType */
 				throw new Schema_Exception(
 					sprintf(
 						'The column name "%s" provided for index "%s" is not a valid SQL identifier.',
@@ -131,39 +120,10 @@ final class Index_Definition {
 	}
 
 	/**
-	 * Sets the index algorithm (e.g., BTREE or HASH).
-	 *
-	 * @param string $algorithm The index algorithm. Use `Index_Algorithm` constants.
-	 * @phpstan-param Index_Algorithm::* $algorithm
-	 *
-	 * @return self The current instance for fluent method chaining.
-	 *
-	 * @throws Schema_Exception If the algorithm is invalid.
-	 */
-	public function using( string $algorithm ): self {
-		$valid_algorithms = Index_Algorithm::get_all();
-		if ( ! in_array( $algorithm, $valid_algorithms, true ) ) {
-			throw new Schema_Exception(
-				sprintf(
-					'The specified index algorithm "%s" on index "%s" is not valid. Please use one of: "%s".',
-					$algorithm,
-					$this->name,
-					implode( '", "', $valid_algorithms )
-				)
-			);
-		}
-		$this->using = $algorithm;
-
-		return $this;
-	}
-
-	/**
 	 * Sets a prefix length for a specific column in the index.
 	 *
-	 * @param string $column The name of the column.
-	 * @param int    $length The number of characters/bytes to index. Must be a positive integer.
-	 * @phpstan-param non-empty-string $column
-	 * @phpstan-param positive-int $length
+	 * @param non-empty-string $column The name of the column.
+	 * @param positive-int     $length The number of characters/bytes to index. Must be a positive integer.
 	 *
 	 * @return self The current instance for fluent method chaining.
 	 *
@@ -188,8 +148,7 @@ final class Index_Definition {
 	/**
 	 * Generates the SQL definition fragment for this index.
 	 *
-	 * @return string The SQL fragment for the CREATE TABLE statement.
-	 * @phpstan-return non-empty-string
+	 * @return non-empty-string The SQL fragment for the CREATE TABLE statement.
 	 */
 	public function to_sql(): string {
 		$type_sql = match ( $this->type ) {
@@ -211,10 +170,6 @@ final class Index_Definition {
 		$columns_sql = '(' . implode( ', ', $column_definitions ) . ')';
 		$sql_parts   = [ $type_sql, "`{$this->name}`", $columns_sql ];
 
-		if ( null !== $this->using ) {
-			$sql_parts[] = "USING {$this->using}";
-		}
-
 		return implode( ' ', $sql_parts );
 	}
 
@@ -222,8 +177,8 @@ final class Index_Definition {
 	 * Gets the type of the index.
 	 *
 	 * @return string The index type (e.g., INDEX, UNIQUE).
-	 *
 	 * @phpstan-return Index_Types_Excluding_Primary
+	 * @psalm-return Index_Types_Excluding_Primary
 	 */
 	public function get_type(): string {
 		return $this->type;
@@ -232,9 +187,7 @@ final class Index_Definition {
 	/**
 	 * Gets the columns included in the index.
 	 *
-	 * @return array The list of column names.
-	 *
-	 * @phpstan-return list<non-empty-string>
+	 * @return list<non-empty-string> The list of column names.
 	 */
 	public function get_columns(): array {
 		return $this->columns;
@@ -243,9 +196,7 @@ final class Index_Definition {
 	/**
 	 * Gets the name of the index.
 	 *
-	 * @return string The index name.
-	 *
-	 * @phpstan-return non-empty-string
+	 * @return non-empty-string The index name.
 	 */
 	public function get_name(): string {
 		return $this->name;

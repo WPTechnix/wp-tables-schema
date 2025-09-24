@@ -23,8 +23,7 @@ final class Column_Definition {
 	/**
 	 * Column name.
 	 *
-	 * @var string
-	 * @phpstan-var non-empty-string
+	 * @var non-empty-string
 	 */
 	private string $name;
 
@@ -32,6 +31,7 @@ final class Column_Definition {
 	 * Column data type (e.g., 'VARCHAR', 'BIGINT').
 	 *
 	 * @var string
+	 * @psalm-var Column_Type::*
 	 * @phpstan-var Column_Type::*
 	 */
 	private string $type;
@@ -39,8 +39,7 @@ final class Column_Definition {
 	/**
 	 * Arguments for the data type (e.g., length, precision).
 	 *
-	 * @var array
-	 * @phpstan-var list<int|string>
+	 * @var list<int|string>
 	 */
 	private array $args;
 
@@ -75,8 +74,7 @@ final class Column_Definition {
 	/**
 	 * A descriptive comment for the column.
 	 *
-	 * @var string|null
-	 * @phpstan-var non-empty-string|null
+	 * @var non-empty-string|null
 	 */
 	private ?string $comment = null;
 
@@ -90,16 +88,14 @@ final class Column_Definition {
 	/**
 	 * The character set for the column.
 	 *
-	 * @var string|null
-	 * @phpstan-var non-empty-string|null
+	 * @var non-empty-string|null
 	 */
 	private ?string $charset = null;
 
 	/**
 	 * The collation for the column.
 	 *
-	 * @var string|null
-	 * @phpstan-var non-empty-string|null
+	 * @var non-empty-string|null
 	 */
 	private ?string $collation = null;
 
@@ -120,8 +116,7 @@ final class Column_Definition {
 	/**
 	 * The custom name for the UNIQUE index, if specified.
 	 *
-	 * @var string|null
-	 * @phpstan-var non-empty-string|null
+	 * @var non-empty-string|null
 	 */
 	private ?string $unique_key_name = null;
 
@@ -135,8 +130,7 @@ final class Column_Definition {
 	/**
 	 * The custom name for the INDEX, if specified.
 	 *
-	 * @var string|null
-	 * @phpstan-var non-empty-string|null
+	 * @var non-empty-string|null
 	 */
 	private ?string $index_name = null;
 
@@ -150,8 +144,7 @@ final class Column_Definition {
 	/**
 	 * The custom name for the FULLTEXT key, if specified.
 	 *
-	 * @var string|null
-	 * @phpstan-var non-empty-string|null
+	 * @var non-empty-string|null
 	 */
 	private ?string $fulltext_key_name = null;
 
@@ -165,23 +158,21 @@ final class Column_Definition {
 	/**
 	 * The custom name for the SPATIAL key, if specified.
 	 *
-	 * @var string|null
-	 * @phpstan-var non-empty-string|null
+	 * @var non-empty-string|null
 	 */
 	private ?string $spatial_key_name = null;
 
 	/**
 	 * Constructs a Column_Definition instance.
 	 *
-	 * @param string $name The name of the column.
-	 * @param string $type The data type from `Column_Type` constants.
-	 * @param array  $args Optional arguments for the type (e.g., `[255]` for VARCHAR).
+	 * @param non-empty-string $name The name of the column.
+	 * @param string           $type The data type from `Column_Type` constants.
+	 * @param list<int|string> $args Optional arguments for the type (e.g., `[255]` for VARCHAR).
+	 *
+	 * @phpstan-param Column_Type::* $type
+	 * @psalm-param Column_Type::* $type
 	 *
 	 * @throws Schema_Exception If the name or type is invalid.
-	 *
-	 * @phpstan-param non-empty-string $name
-	 * @phpstan-param Column_Type::* $type
-	 * @phpstan-param list<int|string> $args
 	 */
 	public function __construct( string $name, string $type, array $args = [] ) {
 		if ( ! Util::valid_sql_identifier( $name ) ) {
@@ -195,7 +186,6 @@ final class Column_Definition {
 			);
 		}
 
-		$type = strtoupper( trim( $type ) );
 		if ( ! in_array( $type, Column_Type::get_all(), true ) ) {
 			throw new Schema_Exception(
 				sprintf(
@@ -204,8 +194,6 @@ final class Column_Definition {
 				)
 			);
 		}
-
-		/** @phpstan-var Column_Type::* $type */
 
 		$this->type = $type;
 		$this->name = $name;
@@ -253,7 +241,7 @@ final class Column_Definition {
 	 *
 	 * If the value is `null`, the column will automatically be made nullable.
 	 *
-	 * @param string|int|float|bool|null $value The default value.
+	 * @param string|int|float|bool|null $value         The default value.
 	 * @param bool                       $is_expression Set to true if `$value` is a SQL function (e.g., 'CURRENT_TIMESTAMP').
 	 *
 	 * @return self The current instance for fluent method chaining.
@@ -315,6 +303,8 @@ final class Column_Definition {
 	 * Sets the default value to CURRENT_TIMESTAMP.
 	 *
 	 * @return self The current instance for fluent method chaining.
+	 * @noinspection PhpUnhandledExceptionInspection
+	 * @noinspection PhpDocMissingThrowsInspection
 	 */
 	public function current_timestamp_as_default(): self {
 		return $this->default( 'CURRENT_TIMESTAMP', true );
@@ -399,8 +389,7 @@ final class Column_Definition {
 	/**
 	 * Adds a UNIQUE key on this column.
 	 *
-	 * @param string|null $key_name Optional custom name for the unique key.
-	 * @phpstan-param non-empty-string|null $key_name
+	 * @param non-empty-string|null $key_name Optional custom name for the unique key.
 	 *
 	 * @return self The current instance for fluent method chaining.
 	 *
@@ -426,8 +415,7 @@ final class Column_Definition {
 	/**
 	 * Adds a standard/non-unique INDEX (KEY) on this column.
 	 *
-	 * @param string|null $index_name Optional custom name for the index.
-	 * @phpstan-param non-empty-string|null $index_name
+	 * @param non-empty-string|null $index_name Optional custom name for the index.
 	 *
 	 * @return self The current instance for fluent method chaining.
 	 *
@@ -453,8 +441,7 @@ final class Column_Definition {
 	/**
 	 * Adds a FULLTEXT index on this column.
 	 *
-	 * @param string|null $key_name Optional custom name for the fulltext key.
-	 * @phpstan-param non-empty-string|null $key_name
+	 * @param non-empty-string|null $key_name Optional custom name for the fulltext key.
 	 *
 	 * @return self The current instance for fluent method chaining.
 	 *
@@ -495,8 +482,7 @@ final class Column_Definition {
 	 *
 	 * A spatially indexed column must be of a spatial data type and must be defined as NOT NULL.
 	 *
-	 * @param string|null $key_name Optional custom name for the spatial index.
-	 * @phpstan-param non-empty-string|null $key_name
+	 * @param non-empty-string|null $key_name Optional custom name for the spatial index.
 	 *
 	 * @return self The current instance for fluent method chaining.
 	 *
@@ -541,8 +527,7 @@ final class Column_Definition {
 	/**
 	 * Adds a comment to the column definition.
 	 *
-	 * @param string $comment The comment text.
-	 * @phpstan-param non-empty-string $comment
+	 * @param non-empty-string $comment The comment text.
 	 *
 	 * @return self The current instance for fluent method chaining.
 	 */
@@ -577,8 +562,7 @@ final class Column_Definition {
 	/**
 	 * Sets a specific character set for this column.
 	 *
-	 * @param string $charset The character set (e.g., 'utf8mb4').
-	 * @phpstan-param non-empty-string $charset
+	 * @param non-empty-string $charset The character set (e.g., 'utf8mb4').
 	 *
 	 * @return self The current instance for fluent method chaining.
 	 *
@@ -598,7 +582,7 @@ final class Column_Definition {
 
 		$charset = trim( $charset );
 
-		if ( empty( $charset ) ) {
+		if ( '' === $charset ) {
 			throw new Schema_Exception(
 				sprintf(
 					'Empty charset provided for column "%s".',
@@ -614,8 +598,7 @@ final class Column_Definition {
 	/**
 	 * Sets a specific collation for this column.
 	 *
-	 * @param string $collation The collation (e.g., 'utf8mb4_unicode_ci').
-	 * @phpstan-param non-empty-string $collation
+	 * @param non-empty-string $collation The collation (e.g., 'utf8mb4_unicode_ci').
 	 *
 	 * @return self The current instance for fluent method chaining.
 	 *
@@ -635,7 +618,7 @@ final class Column_Definition {
 
 		$collation = trim( $collation );
 
-		if ( empty( $collation ) ) {
+		if ( '' === $collation ) {
 			throw new Schema_Exception(
 				sprintf(
 					'Empty collation provided for column "%s".',
@@ -654,12 +637,11 @@ final class Column_Definition {
 	 * As composite primary keys are not used, the PRIMARY KEY clause is
 	 * always generated here if the column is marked as primary.
 	 *
-	 * @return string The SQL fragment for the column.
-	 * @phpstan-return non-empty-string
+	 * @return non-empty-string The SQL fragment for the column.
 	 */
 	public function to_sql(): string {
 		$type_with_args = $this->type;
-		if ( ! empty( $this->args ) ) {
+		if ( [] !== $this->args ) {
 			$type_with_args .= '(' . implode( ',', $this->args ) . ')';
 		}
 
@@ -699,8 +681,7 @@ final class Column_Definition {
 	/**
 	 * Gets the column name.
 	 *
-	 * @return string
-	 * @phpstan-return non-empty-string
+	 * @return non-empty-string
 	 */
 	public function get_name(): string {
 		return $this->name;
@@ -727,8 +708,7 @@ final class Column_Definition {
 	/**
 	 * Gets the custom name for the unique index, if set.
 	 *
-	 * @return string|null
-	 * @phpstan-return non-empty-string|null
+	 * @return non-empty-string|null
 	 */
 	public function get_unique_key_name(): ?string {
 		return $this->unique_key_name;
@@ -746,8 +726,7 @@ final class Column_Definition {
 	/**
 	 * Gets the custom name for the standard index, if set.
 	 *
-	 * @return string|null
-	 * @phpstan-return non-empty-string|null
+	 * @return non-empty-string|null
 	 */
 	public function get_index_name(): ?string {
 		return $this->index_name;
@@ -765,8 +744,7 @@ final class Column_Definition {
 	/**
 	 * Gets the custom name for the FULLTEXT key, if set.
 	 *
-	 * @return string|null
-	 * @phpstan-return non-empty-string|null
+	 * @return non-empty-string|null
 	 */
 	public function get_fulltext_key_name(): ?string {
 		return $this->fulltext_key_name;
@@ -784,8 +762,7 @@ final class Column_Definition {
 	/**
 	 * Gets the custom name for the SPATIAL key, if set.
 	 *
-	 * @return string|null
-	 * @phpstan-return non-empty-string|null
+	 * @return non-empty-string|null
 	 */
 	public function get_spatial_key_name(): ?string {
 		return $this->spatial_key_name;

@@ -28,10 +28,6 @@ class Test_Complex_Schema_Table extends Table {
 	protected string $table_singular_name = 'complex';
 
 	/**
-	 * @var string The alias used for this table in the database.
-	 */
-	protected string $table_alias = 'com';
-	/**
 	 * @var string The primary key column of the table.
 	 */
 	protected string $primary_key_column = 'id';

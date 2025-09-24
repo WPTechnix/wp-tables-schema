@@ -34,13 +34,6 @@ class Test_Compatibility_Table extends Table {
 	protected string $table_singular_name = 'compat';
 
 	/**
-	 * Table alias used in queries.
-	 *
-	 * @var string
-	 */
-	protected string $table_alias = 'cmp';
-
-	/**
 	 * Primary key column name for the table.
 	 *
 	 * @var string

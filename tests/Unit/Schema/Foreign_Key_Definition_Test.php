@@ -162,21 +162,6 @@ final class Foreign_Key_Definition_Test extends TestCase {
 	}
 
 	/**
-	 * Tests that actions are case-insensitive and whitespace is trimmed.
-	 *
-	 * @test
-	 */
-	public function test_actions_are_case_insensitive_and_trimmed(): void {
-		$fk = new Foreign_Key_Definition( 'fk_user_id', 'user_id' );
-		$fk->references( 'users', 'id' )
-			->on_delete( ' cascade ' )
-			->on_update( ' set null ' );
-
-		$expected_sql = 'CONSTRAINT `fk_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE SET NULL';
-		self::assertSame( $expected_sql, $fk->to_sql() );
-	}
-
-	/**
 	 * Tests that on_delete() throws an exception for an invalid action.
 	 *
 	 * @test

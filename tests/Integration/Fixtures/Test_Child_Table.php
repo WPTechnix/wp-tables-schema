@@ -35,13 +35,6 @@ class Test_Child_Table extends Table {
 	protected string $table_singular_name = 'child';
 
 	/**
-	 * Table alias.
-	 *
-	 * @var string
-	 */
-	protected string $table_alias = 'chi';
-
-	/**
 	 * Primary key column.
 	 *
 	 * @var string
