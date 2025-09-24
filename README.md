@@ -148,3 +148,7 @@ For a deep dive into every feature, please refer to the complete documentation:
 4.  [**Managing Table Relationships**](./docs/04-Managing-Table-Relationships.md)
 5.  [**Shortcuts and Helpers**](./docs/05-Shortcuts-and-Helpers.md)
 6.  [**Advanced Topics**](./docs/06-Advanced-Topics.md)
+
+## License
+
+This project is licensed under the [MIT License](./LICENSE.md).
