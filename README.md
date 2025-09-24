@@ -2,6 +2,10 @@
 
 A fluent, powerful, and developer-friendly library for creating and managing custom database tables in WordPress. Define your table schemas with an expressive API, handle versioning and migrations with ease, and build robust, modern data layers for your plugins.
 
+[![Latest Version](https://img.shields.io/packagist/v/wptechnix/wp-tables-schema.svg?style=for-the-badge)](https://packagist.org/packages/wptechnix/wp-tables-schema)
+[![Total Downloads](https://img.shields.io/packagist/dt/wptechnix/wp-tables-schema.svg?style=for-the-badge)](https://packagist.org/packages/wptechnix/wp-tables-schema)
+[![License](https://img.shields.io/packagist/l/wptechnix/wp-tables-schema.svg?style=for-the-badge)](https://packagist.org/packages/wptechnix/wp-tables-schema)
+
 ---
 
 ## Key Features
