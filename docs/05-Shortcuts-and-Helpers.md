@@ -138,7 +138,6 @@ Your `Table` class isn't just for migrations; it's also a dynamic source of info
 -   `get_table_name()`: Returns the full, prefixed table name.
 -   `get_primary_key()`: Returns the name of the primary key column.
 -   `get_foreign_key_name()`: Returns the conventional name for this table's foreign key when used in other tables.
--   `get_table_alias()`: Returns the short alias for use in SQL JOINs.
 
 **Example**: Writing a clean, future-proof query to get a task by its ID.
 ```php

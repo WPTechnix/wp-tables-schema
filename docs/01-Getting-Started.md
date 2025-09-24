@@ -71,7 +71,6 @@ class Tasks_Table extends Table
     protected int $schema_version = 10001;
     protected string $table_name = 'tasks';
     protected string $table_singular_name = 'task';
-    protected string $table_alias = 't';
     protected string $foreign_key_name = 'task_id';
     protected string $plugin_prefix = 'my_plugin_';
 

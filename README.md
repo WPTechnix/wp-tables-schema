@@ -61,7 +61,6 @@ class Events_Table extends Table
     
     // --- The rest of these properties are optional helpers ---
     protected string $table_singular_name = 'event';
-    protected string $table_alias = 'e';
     protected string $foreign_key_name = 'event_id';
 
     /**
