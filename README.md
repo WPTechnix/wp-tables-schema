@@ -19,7 +19,7 @@ A fluent, powerful, and developer-friendly library for creating and managing cus
 
 ## Requirements
 
--   PHP 8.0+
+-   PHP 8.x
 -   WordPress 5.0+
 -   MySQL 5.6+ or MariaDB 10.1+
 
