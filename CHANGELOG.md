@@ -1,5 +1,11 @@
 # Changelog
 
+## <small>1.0.1 (2025-10-10)</small>
+
+* fix(composer): update PHP version constraint to ^8.0 ([4597122](https://github.com/WPTechnix/wp-tables-schema/commit/4597122))
+* chore(Docs): reflect docs with recent changes ([101d192](https://github.com/WPTechnix/wp-tables-schema/commit/101d192))
+* docs: add MIT license reference and link to LICENSE.md in README ([080a8d1](https://github.com/WPTechnix/wp-tables-schema/commit/080a8d1))
+
 ## 1.0.0 (2025-08-23)
 
 ### Features
